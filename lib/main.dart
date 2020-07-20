@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'screens/intro_screen.dart';
 import 'screens/main_screen.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'utils/constants.dart';
 
 void main() {
   runApp(Polymathic());
@@ -15,8 +17,17 @@ class Polymathic extends StatelessWidget {
     return MaterialApp(
       title: 'Polymathic',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: kPrimaryColor,
+        accentColor: kAccentColor,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        appBarTheme: AppBarTheme(
+          elevation: 0,
+          brightness: Brightness.light,
+          color: Colors.transparent,
+        ),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: kPrimaryColor,
+        ),
       ),
       home: FirstLaunch(),
     );
@@ -44,7 +55,7 @@ class _FirstLaunchState extends State<FirstLaunch> {
         ),
       );
     } else {
-      // await prefs.setBool('firstLaunch', false);
+      await prefs.setBool('firstLaunch', false);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => IntroScreen(),
@@ -64,38 +75,6 @@ class _FirstLaunchState extends State<FirstLaunch> {
     return Scaffold(
       body: Center(
         child: Text('Loading...'),
-      ),
-    );
-  }
-}
-
-class IntroScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Introduction'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Text('Hi, what\'s your name?'),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(MaterialIcons.navigate_next),
-        onPressed: () {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => MainScreen(
-                title: 'Polymathic',
-              ),
-            ),
-          );
-        },
       ),
     );
   }
