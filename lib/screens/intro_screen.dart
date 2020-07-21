@@ -3,6 +3,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:polymathic/utils/constants.dart';
 import 'main_screen.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -69,12 +70,19 @@ class _IntroScreenState extends State<IntroScreen> {
                   child: TextField(
                     textAlign: TextAlign.center,
                     decoration: InputDecoration(
-                        fillColor: Colors.indigo,
+                        fillColor: kPrimaryColor,
                         filled: true,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
                             Radius.circular(64.0),
                           ),
+                          borderSide: BorderSide(width: 0.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(64.0),
+                          ),
+                          borderSide: BorderSide(width: 0.0),
                         ),
                         hintStyle: TextStyle(color: Colors.white54),
                         hintText: 'What\'s your name?'),
