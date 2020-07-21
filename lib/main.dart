@@ -55,7 +55,7 @@ class _FirstLaunchState extends State<FirstLaunch> {
         ),
       );
     } else {
-      await prefs.setBool('firstLaunch', false);
+      // await prefs.setBool('firstLaunch', false);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => IntroScreen(),

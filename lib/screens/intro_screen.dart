@@ -11,14 +11,15 @@ class IntroScreen extends StatefulWidget {
 }
 
 class _IntroScreenState extends State<IntroScreen> {
-  final String _introSvg = 'assets/svg/intro.svg';
+  final String _introSvg = 'assets/svg/thinking.svg';
   bool _isNextEnabled = false;
   String name = 'undefined';
 
   void saveName(String name) async {
     print('Saved name to SharedPreferences');
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('name', name);
+    await prefs.setString('name', name);
+    await prefs.setBool('firstLaunch', false);
   }
 
   @override
@@ -29,73 +30,71 @@ class _IntroScreenState extends State<IntroScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Expanded(
-              flex: 1,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    'Welcome\nto',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w300,
-                    ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'Welcome to',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w300,
                   ),
-                  Text(
-                    'Polymathic',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w500,
-                    ),
+                ),
+                Text(
+                  'Polymathic',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w500,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            Expanded(
-              flex: 2,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  SvgPicture.asset(
-                    _introSvg,
-                    height: 256,
-                    semanticsLabel: 'Introduction Image',
-                  ),
-                  SizedBox(
-                    height: 32,
-                  ),
-                  Container(
-                    width: 256,
-                    child: TextField(
-                      textAlign: TextAlign.center,
-                      decoration: InputDecoration(
-                          fillColor: Colors.white30,
-                          filled: true,
-                          border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(64.0)),
+            SizedBox(height: 64),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                SvgPicture.asset(
+                  _introSvg,
+                  height: 256,
+                  semanticsLabel: 'Introduction Image',
+                ),
+                SizedBox(
+                  height: 64,
+                ),
+                Container(
+                  width: 256,
+                  child: TextField(
+                    textAlign: TextAlign.center,
+                    decoration: InputDecoration(
+                        fillColor: Colors.indigo,
+                        filled: true,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(64.0),
                           ),
-                          hintText: 'What\'s your name?'),
-                      onChanged: (value) {
-                        name = value;
+                        ),
+                        hintStyle: TextStyle(color: Colors.white54),
+                        hintText: 'What\'s your name?'),
+                    style: TextStyle(color: Colors.white),
+                    onChanged: (value) {
+                      name = value;
 
-                        setState(() {
-                          if (value != null && value != '') {
-                            print('enabled');
-                            _isNextEnabled = true;
-                          } else {
-                            print('disabled');
-                            _isNextEnabled = false;
-                          }
-                        });
-                      },
-                    ),
+                      setState(() {
+                        if (value != null && value != '') {
+                          print('enabled');
+                          _isNextEnabled = true;
+                        } else {
+                          print('disabled');
+                          _isNextEnabled = false;
+                        }
+                      });
+                    },
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
