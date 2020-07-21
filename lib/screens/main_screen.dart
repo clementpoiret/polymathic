@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:polymathic/components/tabbar_navigation.dart';
 import 'package:polymathic/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:polymathic/components/tabbar_navigation.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key, this.title}) : super(key: key);

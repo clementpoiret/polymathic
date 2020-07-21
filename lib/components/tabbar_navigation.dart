@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
-import 'package:polymathic/pages/task_page.dart';
-import 'package:polymathic/pages/stats_page.dart';
 import 'package:polymathic/pages/about_page.dart';
+import 'package:polymathic/pages/stats_page.dart';
+import 'package:polymathic/pages/task_page.dart';
 import 'package:polymathic/utils/constants.dart';
 
 class TabBarNavigation extends StatefulWidget {
