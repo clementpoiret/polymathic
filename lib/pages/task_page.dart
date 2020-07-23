@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:polymathic/utils/constants.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:polymathic/components/tasks_list.dart';
 
 class TaskPage extends StatefulWidget {
   @override
@@ -39,7 +40,6 @@ class _TaskPageState extends State<TaskPage> {
                               hintText: 'Enter your task here',
                             ),
                             onChanged: (value) {
-                              print(value);
                               setState(() {
                                 if (value != null && value != '') {
                                   _isAddable = true;
@@ -67,7 +67,7 @@ class _TaskPageState extends State<TaskPage> {
                     ),
                   ),
                   Container(
-                    color: Color(0x0D000000),
+                    color: Color(0x14000000),
                     child: Column(
                       children: <Widget>[
                         SwitchListTile(
@@ -135,6 +135,10 @@ class _TaskPageState extends State<TaskPage> {
               ),
             ),
           ),
+          SizedBox(
+            height: 16.0,
+          ),
+          TasksList(),
         ],
       ),
     );
