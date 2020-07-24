@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:polymathic/components/tag.dart';
 import 'package:polymathic/helpers/database.dart';
 import 'package:polymathic/utils/constants.dart';
 
@@ -18,6 +19,11 @@ class _TaskItemState extends State<TaskItem> {
   bool isDone = false;
 
   final dbHelper = DatabaseHelper.instance;
+
+  void _reinsert() async {
+    final id = await dbHelper.insert(widget.task);
+    print('reinserted row: $id');
+  }
 
   void _delete() async {
     final rowsDeleted = await dbHelper.delete(widget.task['_id']);
@@ -39,7 +45,12 @@ class _TaskItemState extends State<TaskItem> {
                 setState(() {
                   isDone = value;
                 });
-                _delete();
+
+                if (isDone) {
+                  _delete();
+                } else {
+                  _reinsert();
+                }
               },
             ),
             Container(
@@ -55,7 +66,11 @@ class _TaskItemState extends State<TaskItem> {
                 children: <Widget>[
                   Text(
                     widget.task['content'],
-                    style: TextStyle(fontSize: 16),
+                    style: isDone
+                        ? TextStyle(
+                            fontSize: 16,
+                            decoration: TextDecoration.lineThrough)
+                        : TextStyle(fontSize: 16),
                   ),
                   if (widget.task['important'] == 1 ||
                       widget.task['urgent'] == 1)
@@ -72,9 +87,10 @@ class _TaskItemState extends State<TaskItem> {
                             color: Colors.indigo[400],
                             textColor: Colors.white,
                           ),
-                        SizedBox(
-                          width: 8.0,
-                        ),
+                        if (widget.task['important'] == 1)
+                          SizedBox(
+                            width: 8.0,
+                          ),
                         if (widget.task['urgent'] == 1)
                           Tag(
                             text: 'Urgent',
@@ -87,43 +103,6 @@ class _TaskItemState extends State<TaskItem> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class Tag extends StatelessWidget {
-  const Tag({
-    Key key,
-    @required this.text,
-    @required this.color,
-    @required this.textColor,
-  }) : super(key: key);
-
-  final String text;
-  final Color color;
-  final Color textColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.all(
-          Radius.circular(32.0),
-        ),
-      ),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Text(
-            text,
-            style: TextStyle(
-              color: textColor,
-              fontSize: 12.0,
-            ),
-          ),
         ),
       ),
     );

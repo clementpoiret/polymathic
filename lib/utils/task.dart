@@ -19,3 +19,25 @@ class Task {
     };
   }
 }
+
+int getScore(Map<String, dynamic> task) {
+  // todo: improve the score to be more accurate
+  int score = 0;
+
+  if (task['important'] == 1) {
+    score += 2;
+  }
+
+  if (task['urgent'] == 1) {
+    score++;
+  }
+
+  return score;
+}
+
+List<Map<String, dynamic>> sortTasks(List<Map<String, dynamic>> tasks) {
+  List<Map<String, dynamic>> sortedTasks = List.from(tasks);
+  sortedTasks.sort((a, b) => getScore(b).compareTo(getScore(a)));
+
+  return sortedTasks;
+}

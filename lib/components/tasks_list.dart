@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:polymathic/components/task_item.dart';
+import 'package:polymathic/utils/task.dart';
 
 class TasksList extends StatefulWidget {
   const TasksList({
@@ -37,7 +38,7 @@ class _TasksListState extends State<TasksList> {
         visible: _isListVisible,
         child: ListView(
           children: <Widget>[
-            for (var task in widget.taskList) TaskItem(task: task),
+            for (var task in sortTasks(widget.taskList)) TaskItem(task: task),
           ],
         ),
         replacement: Column(
