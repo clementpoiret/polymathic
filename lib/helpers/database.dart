@@ -41,8 +41,8 @@ class DatabaseHelper {
     CREATE TABLE $table (
       $columnId INTEGER PRIMARY KEY,
       $columnContent TEXT NOT NULL,
-      $columnImportant BOOLEAN NOT NULL,
-      $columnUrgent BOOLEAN NOT NULL
+      $columnImportant INTEGER NOT NULL,
+      $columnUrgent INTEGER NOT NULL
     )
     ''');
   }

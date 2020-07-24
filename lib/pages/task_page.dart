@@ -3,6 +3,8 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:polymathic/utils/constants.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:polymathic/components/tasks_list.dart';
+import 'package:polymathic/utils/task.dart';
+import 'package:polymathic/helpers/database.dart';
 
 class TaskPage extends StatefulWidget {
   @override
@@ -14,6 +16,39 @@ class _TaskPageState extends State<TaskPage> {
   bool _isAddable = false;
   bool isImportant = false;
   bool isUrgent = false;
+  String taskContent = '';
+
+  final dbHelper = DatabaseHelper.instance;
+  List<Map<String, dynamic>> taskList = [];
+
+  void _insert(Task task) async {
+    Map<String, dynamic> row = task.toMap();
+    final id = await dbHelper.insert(row);
+    print('inserted row: $id');
+  }
+
+  void _query() async {
+    final allRows = await dbHelper.queryAllRows();
+    print('query all rows:');
+    allRows.forEach((row) => print(row));
+
+    setState(() {
+      taskList = allRows;
+    });
+  }
+
+  void _onPressAddButton(Task task) {
+    print(task.toMap());
+    _insert(task);
+    _query();
+    _isAddable = false;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _query();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +75,8 @@ class _TaskPageState extends State<TaskPage> {
                               hintText: 'Enter your task here',
                             ),
                             onChanged: (value) {
+                              taskContent = value;
+
                               setState(() {
                                 if (value != null && value != '') {
                                   _isAddable = true;
@@ -60,7 +97,16 @@ class _TaskPageState extends State<TaskPage> {
                             shape: CircleBorder(
                               side: BorderSide(color: kPrimaryColor),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              Task task = Task(
+                                  content: taskContent,
+                                  isImportant: isImportant ? 1 : 0,
+                                  isUrgent: isUrgent ? 1 : 0);
+                              _onPressAddButton(task);
+                              setState(() {
+                                _isAddTaskVisible = false;
+                              });
+                            },
                           ),
                         )
                       ],
@@ -138,7 +184,9 @@ class _TaskPageState extends State<TaskPage> {
           SizedBox(
             height: 16.0,
           ),
-          TasksList(),
+          TasksList(
+            taskList: taskList,
+          ),
         ],
       ),
     );

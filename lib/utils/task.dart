@@ -1,8 +1,8 @@
 class Task {
   final int id;
   final String content;
-  final bool isImportant;
-  final bool isUrgent;
+  final int isImportant;
+  final int isUrgent;
 
   Task({
     this.id,
