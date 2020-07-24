@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:polymathic/components/tag.dart';
 import 'package:polymathic/helpers/database.dart';
 import 'package:polymathic/utils/constants.dart';
+import 'package:polymathic/utils/task.dart';
 
 class TaskItem extends StatefulWidget {
   const TaskItem({
@@ -71,6 +72,14 @@ class _TaskItemState extends State<TaskItem> {
                             fontSize: 16,
                             decoration: TextDecoration.lineThrough)
                         : TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(
+                    height: 4.0,
+                  ),
+                  Text(
+                    getAdvice(widget.task),
+                    style: TextStyle(
+                        fontStyle: FontStyle.italic, color: Colors.grey),
                   ),
                   if (widget.task['important'] == 1 ||
                       widget.task['urgent'] == 1)

@@ -41,3 +41,18 @@ List<Map<String, dynamic>> sortTasks(List<Map<String, dynamic>> tasks) {
 
   return sortedTasks;
 }
+
+String getAdvice(Map<String, dynamic> task) {
+  final bool isImportant = task['important'] == 1;
+  final bool isUrgent = task['urgent'] == 1;
+
+  if (isImportant && isUrgent) {
+    return 'Do it, now.';
+  } else if (isImportant) {
+    return 'Schedule it.';
+  } else if (isUrgent) {
+    return 'Delegate.';
+  } else {
+    return 'Avoid this task.';
+  }
+}
