@@ -70,7 +70,9 @@ class _TaskItemState extends State<TaskItem> {
                     style: isDone
                         ? TextStyle(
                             fontSize: 16,
-                            decoration: TextDecoration.lineThrough)
+                            decoration: TextDecoration.lineThrough,
+                            color: Colors.grey,
+                          )
                         : TextStyle(fontSize: 16),
                   ),
                   SizedBox(
@@ -78,8 +80,16 @@ class _TaskItemState extends State<TaskItem> {
                   ),
                   Text(
                     getAdvice(widget.task),
-                    style: TextStyle(
-                        fontStyle: FontStyle.italic, color: Colors.grey),
+                    style: isDone
+                        ? TextStyle(
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey,
+                            decoration: TextDecoration.lineThrough,
+                          )
+                        : TextStyle(
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey,
+                          ),
                   ),
                   if (widget.task['important'] == 1 ||
                       widget.task['urgent'] == 1)

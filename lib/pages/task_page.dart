@@ -1,10 +1,10 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:polymathic/utils/constants.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:polymathic/components/tasks_list.dart';
-import 'package:polymathic/utils/task.dart';
 import 'package:polymathic/helpers/database.dart';
+import 'package:polymathic/utils/constants.dart';
+import 'package:polymathic/utils/task.dart';
 
 class TaskPage extends StatefulWidget {
   @override
@@ -12,6 +12,7 @@ class TaskPage extends StatefulWidget {
 }
 
 class _TaskPageState extends State<TaskPage> {
+  int nTasks = 0;
   bool _isAddTaskVisible = false;
   bool _isAddable = false;
   bool isImportant = false;
@@ -20,35 +21,6 @@ class _TaskPageState extends State<TaskPage> {
 
   final dbHelper = DatabaseHelper.instance;
   List<Map<String, dynamic>> taskList = [];
-
-  void _insert(Task task) async {
-    Map<String, dynamic> row = task.toMap();
-    final id = await dbHelper.insert(row);
-    print('inserted row: $id');
-  }
-
-  void _query() async {
-    final allRows = await dbHelper.queryAllRows();
-    print('query all rows:');
-    allRows.forEach((row) => print(row));
-
-    setState(() {
-      taskList = allRows;
-    });
-  }
-
-  void _onPressAddButton(Task task) {
-    print(task.toMap());
-    _insert(task);
-    _query();
-    _isAddable = false;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _query();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,9 +138,7 @@ class _TaskPageState extends State<TaskPage> {
                         ),
                         fillColor: kAccentColor,
                         onPressed: () {
-                          setState(() {
-                            _isAddTaskVisible = true;
-                          });
+                          ivyLeeCheck();
                         },
                       ),
                       Text(
@@ -190,5 +160,73 @@ class _TaskPageState extends State<TaskPage> {
         ],
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _query();
+  }
+
+  void _insert(Task task) async {
+    Map<String, dynamic> row = task.toMap();
+    final id = await dbHelper.insert(row);
+    print('inserted row: $id');
+  }
+
+  void _onPressAddButton(Task task) {
+    print(task.toMap());
+    _insert(task);
+    _query();
+    _isAddable = false;
+  }
+
+  void _query() async {
+    final allRows = await dbHelper.queryAllRows();
+    final rowCount = await dbHelper.queryRowCount();
+
+    setState(() {
+      taskList = allRows;
+      nTasks = rowCount;
+    });
+  }
+
+  void ivyLeeCheck() {
+    void _showForm() {
+      setState(() {
+        _isAddTaskVisible = true;
+      });
+    }
+
+    if (nTasks < 6) {
+      _showForm();
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Wow, that\'s a lot!'),
+            content: Text(
+                'You already have 6 scheduled tasks for today.\nAccording to the Ivy Lee Method for productivity, you should focus on those 6 tasks before adding more.'),
+            actions: <Widget>[
+              // usually buttons at the bottom of the dialog
+              FlatButton(
+                child: Text("CANCEL"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                child: Text("PROCEED ANYWAY"),
+                onPressed: () {
+                  _showForm();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }
