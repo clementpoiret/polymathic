@@ -4,12 +4,12 @@ import 'package:polymathic/components/task_item.dart';
 import 'package:polymathic/utils/task.dart';
 
 class TasksList extends StatefulWidget {
+  final List<Map<String, dynamic>> taskList;
+
   const TasksList({
     Key key,
     @required this.taskList,
   }) : super(key: key);
-
-  final List<Map<String, dynamic>> taskList;
 
   @override
   _TasksListState createState() => _TasksListState();

@@ -5,12 +5,12 @@ import 'package:polymathic/utils/constants.dart';
 import 'package:polymathic/utils/task.dart';
 
 class TaskItem extends StatefulWidget {
+  final Map<String, dynamic> task;
+
   const TaskItem({
     Key key,
     @required this.task,
   }) : super(key: key);
-
-  final Map<String, dynamic> task;
 
   @override
   _TaskItemState createState() => _TaskItemState();
@@ -20,16 +20,6 @@ class _TaskItemState extends State<TaskItem> {
   bool isDone = false;
 
   final dbHelper = DatabaseHelper.instance;
-
-  void _reinsert() async {
-    final id = await dbHelper.insert(widget.task);
-    print('reinserted row: $id');
-  }
-
-  void _delete() async {
-    final rowsDeleted = await dbHelper.delete(widget.task['_id']);
-    print('deleted $rowsDeleted row(s): row ${widget.task['_id']}');
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,5 +115,21 @@ class _TaskItemState extends State<TaskItem> {
         ),
       ),
     );
+  }
+
+  void _delete() async {
+    final rowsDeleted = await dbHelper.delete(
+      DatabaseHelper.tasksTable,
+      widget.task['_id'],
+    );
+    print('deleted $rowsDeleted row(s): row ${widget.task['_id']}');
+  }
+
+  void _reinsert() async {
+    final id = await dbHelper.insert(
+      DatabaseHelper.tasksTable,
+      widget.task,
+    );
+    print('reinserted row: $id');
   }
 }

@@ -170,7 +170,7 @@ class _TaskPageState extends State<TaskPage> {
 
   void _insert(Task task) async {
     Map<String, dynamic> row = task.toMap();
-    final id = await dbHelper.insert(row);
+    final id = await dbHelper.insert(DatabaseHelper.tasksTable, row);
     print('inserted row: $id');
   }
 
@@ -182,8 +182,8 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   void _query() async {
-    final allRows = await dbHelper.queryAllRows();
-    final rowCount = await dbHelper.queryRowCount();
+    final allRows = await dbHelper.queryAllRows(DatabaseHelper.tasksTable);
+    final rowCount = await dbHelper.queryRowCount(DatabaseHelper.tasksTable);
 
     setState(() {
       taskList = allRows;
