@@ -4,6 +4,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:polymathic/components/tasks_list.dart';
 import 'package:polymathic/helpers/database.dart';
 import 'package:polymathic/utils/constants.dart';
+import 'package:polymathic/utils/stat.dart';
 import 'package:polymathic/utils/task.dart';
 
 class TaskPage extends StatefulWidget {
@@ -71,9 +72,17 @@ class _TaskPageState extends State<TaskPage> {
                             ),
                             onPressed: () {
                               Task task = Task(
-                                  content: taskContent,
-                                  isImportant: isImportant ? 1 : 0,
-                                  isUrgent: isUrgent ? 1 : 0);
+                                content: taskContent,
+                                isImportant: isImportant ? 1 : 0,
+                                isUrgent: isUrgent ? 1 : 0,
+                              );
+                              Stat stat = Stat(
+                                urgent: isUrgent ? 1 : 0,
+                                important: isImportant ? 1 : 0,
+                                added: 1,
+                                removed: 0,
+                              );
+                              stat.insert();
                               _onPressAddButton(task);
                               setState(() {
                                 _isAddTaskVisible = false;
@@ -168,29 +177,6 @@ class _TaskPageState extends State<TaskPage> {
     _query();
   }
 
-  void _insert(Task task) async {
-    Map<String, dynamic> row = task.toMap();
-    final id = await dbHelper.insert(DatabaseHelper.tasksTable, row);
-    print('inserted row: $id');
-  }
-
-  void _onPressAddButton(Task task) {
-    print(task.toMap());
-    _insert(task);
-    _query();
-    _isAddable = false;
-  }
-
-  void _query() async {
-    final allRows = await dbHelper.queryAllRows(DatabaseHelper.tasksTable);
-    final rowCount = await dbHelper.queryRowCount(DatabaseHelper.tasksTable);
-
-    setState(() {
-      taskList = allRows;
-      nTasks = rowCount;
-    });
-  }
-
   void ivyLeeCheck() {
     void _showForm() {
       setState(() {
@@ -228,5 +214,30 @@ class _TaskPageState extends State<TaskPage> {
         },
       );
     }
+  }
+
+  void _insert(Task task) async {
+    Map<String, dynamic> row = task.toMap();
+    final id = await dbHelper.insert(DatabaseHelper.tasksTable, row);
+    print('inserted task: $id');
+  }
+
+  void _onPressAddButton(Task task) {
+    print(task.toMap());
+    _insert(task);
+    _query();
+    _isAddable = false;
+    isImportant = false;
+    isUrgent = false;
+  }
+
+  void _query() async {
+    final allRows = await dbHelper.queryAllRows(DatabaseHelper.tasksTable);
+    final rowCount = await dbHelper.queryRowCount(DatabaseHelper.tasksTable);
+
+    setState(() {
+      taskList = allRows;
+      nTasks = rowCount;
+    });
   }
 }

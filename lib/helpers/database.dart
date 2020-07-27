@@ -44,6 +44,12 @@ class DatabaseHelper {
     return await db.insert(table, row);
   }
 
+  Future<List<Map>> query(String sql) async {
+    Database db = await instance.database;
+
+    return await db.rawQuery(sql);
+  }
+
   Future<List<Map<String, dynamic>>> queryAllRows(String table) async {
     Database db = await instance.database;
     return await db.query(table);
@@ -91,5 +97,45 @@ class DatabaseHelper {
       $statRemoved INTEGER NOT NULL
     )
     ''');
+  }
+
+  Future<int> getAddedTasks({int isImportant, int isUrgent}) async {
+    Database db = await instance.database;
+
+    String sql = '''
+        SELECT SUM($statAdded) 
+        FROM $statsTable
+        WHERE $statUrgent = $isUrgent
+        AND $statImportant = $isImportant;
+        ''';
+
+    List<Map> output = await db.rawQuery(sql);
+    var value = output.first.values?.first;
+
+    if (value == null) {
+      return 0;
+    } else {
+      return value;
+    }
+  }
+
+  Future<int> getRemovedTasks({int isImportant, int isUrgent}) async {
+    Database db = await instance.database;
+
+    String sql = '''
+        SELECT SUM($statRemoved) 
+        FROM $statsTable
+        WHERE $statUrgent = $isUrgent
+        AND $statImportant = $isImportant;
+        ''';
+
+    List<Map> output = await db.rawQuery(sql);
+    var value = output.first.values?.first;
+
+    if (value == null) {
+      return 0;
+    } else {
+      return value;
+    }
   }
 }

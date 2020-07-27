@@ -76,13 +76,28 @@ class _IntroScreenState extends State<IntroScreen> {
                           borderRadius: BorderRadius.all(
                             Radius.circular(64.0),
                           ),
-                          borderSide: BorderSide(width: 0.0),
+                          borderSide: BorderSide(
+                            width: 0.0,
+                            color: kPrimaryColor,
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
                             Radius.circular(64.0),
                           ),
-                          borderSide: BorderSide(width: 0.0),
+                          borderSide: BorderSide(
+                            width: 0.0,
+                            color: kPrimaryColor,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(64.0),
+                          ),
+                          borderSide: BorderSide(
+                            width: 0.0,
+                            color: kPrimaryColor,
+                          ),
                         ),
                         hintStyle: TextStyle(color: Colors.white54),
                         hintText: 'What\'s your name?'),
