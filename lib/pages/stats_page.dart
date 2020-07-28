@@ -174,7 +174,7 @@ class _StatsPageState extends State<StatsPage> {
     DateTime daysFromNow = today.add(Duration(days: -7));
 
     String sql = '''
-                 SELECT DATETIME(date) as date,
+                 SELECT STRFTIME('%Y-%m-%d', date) as date,
                  SUM(${DatabaseHelper.statAdded})
                  FROM ${DatabaseHelper.statsTable}
                  WHERE date > '${daysFromNow.toIso8601String()}'
@@ -186,7 +186,7 @@ class _StatsPageState extends State<StatsPage> {
     });
 
     sql = '''
-          SELECT DATETIME(date) as date,
+          SELECT STRFTIME('%Y-%m-%d', date) as date,
           SUM(${DatabaseHelper.statRemoved})
           FROM ${DatabaseHelper.statsTable}
           WHERE date > '${daysFromNow.toIso8601String()}'
@@ -198,7 +198,7 @@ class _StatsPageState extends State<StatsPage> {
     });
 
     sql = '''
-          SELECT DATETIME(date) as date,
+          SELECT STRFTIME('%Y-%m-%d', date) as date,
           SUM(${DatabaseHelper.statRemoved})
           FROM ${DatabaseHelper.statsTable}
           WHERE date > '${daysFromNow.toIso8601String()}'
