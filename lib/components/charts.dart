@@ -156,7 +156,7 @@ class SimpleTimeSeriesChart extends StatelessWidget {
     );
   }
 
-  factory SimpleTimeSeriesChart.withSampleData() {
+  factory SimpleTimeSeriesChart.emptyGraph() {
     return SimpleTimeSeriesChart(
       _createSampleData(),
       animate: true,
@@ -187,24 +187,14 @@ class SimpleTimeSeriesChart extends StatelessWidget {
   }
 
   static List<charts.Series<TimeSerie, DateTime>> _createSampleData() {
-    final completed = [
-      TimeSerie(DateTime(2017, 9, 19), 5),
-      TimeSerie(DateTime(2017, 9, 26), 3),
-      TimeSerie(DateTime(2017, 10, 3), 4),
-      TimeSerie(DateTime(2017, 10, 10), 6),
-    ];
+    final List<TimeSerie> completed = [];
 
-    final added = [
-      TimeSerie(DateTime(2017, 9, 19), 5),
-      TimeSerie(DateTime(2017, 9, 26), 3),
-      TimeSerie(DateTime(2017, 10, 3), 5),
-      TimeSerie(DateTime(2017, 10, 10), 2),
-    ];
+    final List<TimeSerie> added = [];
 
     return [
       charts.Series<TimeSerie, DateTime>(
         id: 'Added Tasks',
-        colorFn: (_, __) => charts.MaterialPalette.gray.shadeDefault,
+        colorFn: (_, __) => charts.MaterialPalette.indigo.shadeDefault,
         domainFn: (TimeSerie sales, _) => sales.time,
         measureFn: (TimeSerie sales, _) => sales.value,
         data: added,

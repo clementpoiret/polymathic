@@ -24,8 +24,10 @@ class _StatsPageState extends State<StatsPage> {
   int nCompletedTasksForDays = 0;
   double productivityScore = double.nan;
 
-  List<TimeSerie> addedTasksTimeSerie;
-  List<TimeSerie> completedTasksTimeSerie;
+  bool showSummaryGraph = false;
+
+  List<TimeSerie> addedTasksTimeSerie = [];
+  List<TimeSerie> completedTasksTimeSerie = [];
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +97,7 @@ class _StatsPageState extends State<StatsPage> {
                               style: TextStyle(fontSize: 32.0),
                             ),
                             Text(
-                              'Completed Tasks (weekly)',
+                              'Completed Tasks ($days days)',
                               style: TextStyle(fontSize: 12.0),
                             ),
                           ],
@@ -114,10 +116,12 @@ class _StatsPageState extends State<StatsPage> {
                   child: Container(
                     height: 256.0,
                     width: double.infinity,
-                    child: tasksSummaryLineChart([
-                      addedTasksTimeSerie,
-                      completedTasksTimeSerie,
-                    ]),
+                    child: showSummaryGraph
+                        ? tasksSummaryLineChart([
+                            addedTasksTimeSerie,
+                            completedTasksTimeSerie,
+                          ])
+                        : SimpleTimeSeriesChart.emptyGraph(),
                   ),
                 ),
               ),
@@ -177,7 +181,9 @@ class _StatsPageState extends State<StatsPage> {
                  GROUP BY date
                  ''';
     List<Map> output = await dbHelper.query(sql);
-    addedTasksTimeSerie = mapsToTimeSeries(output, 'SUM(added)');
+    setState(() {
+      addedTasksTimeSerie = mapsToTimeSeries(output, 'SUM(added)');
+    });
 
     sql = '''
           SELECT DATETIME(date) as date,
@@ -187,7 +193,9 @@ class _StatsPageState extends State<StatsPage> {
           GROUP BY date
           ''';
     output = await dbHelper.query(sql);
-    completedTasksTimeSerie = mapsToTimeSeries(output, 'SUM(removed)');
+    setState(() {
+      completedTasksTimeSerie = mapsToTimeSeries(output, 'SUM(removed)');
+    });
 
     sql = '''
           SELECT DATETIME(date) as date,
@@ -196,7 +204,10 @@ class _StatsPageState extends State<StatsPage> {
           WHERE date > '${daysFromNow.toIso8601String()}'
           ''';
     output = await dbHelper.query(sql);
-    nCompletedTasksForDays = output.first.values?.last;
+    setState(() {
+      nCompletedTasksForDays = output.first.values?.last;
+      showSummaryGraph = true;
+    });
   }
 
   SimpleTimeSeriesChart tasksSummaryLineChart(
@@ -221,13 +232,13 @@ class _StatsPageState extends State<StatsPage> {
     if (this.mounted) {
       setState(() {
         _enoughData = (value == null) ? false : true;
-
-        if (_enoughData) {
-          _completedTasks();
-          _productivityIndex();
-          _summaryData(days);
-        }
       });
+
+      if (_enoughData) {
+        _completedTasks();
+        _productivityIndex();
+        _summaryData(days);
+      }
     }
   }
 
@@ -236,7 +247,11 @@ class _StatsPageState extends State<StatsPage> {
         'SELECT SUM(${DatabaseHelper.statRemoved}) FROM ${DatabaseHelper.statsTable}';
     List<Map> output = await dbHelper.query(sql);
 
-    nCompletedTasks = output.first.values?.first;
+    if (this.mounted) {
+      setState(() {
+        nCompletedTasks = output.first.values?.first;
+      });
+    }
   }
 
   void _productivityIndex() async {
