@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:polymathic/components/charts.dart';
 import 'package:polymathic/helpers/database.dart';
 import 'package:polymathic/utils/stat.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 
 class StatsPage extends StatefulWidget {
   @override
@@ -12,13 +13,19 @@ class StatsPage extends StatefulWidget {
 }
 
 class _StatsPageState extends State<StatsPage> {
+  int days = 7;
+
   final DatabaseHelper dbHelper = DatabaseHelper.instance;
   final String _noDataSvg = 'assets/svg/nodata.svg';
 
   bool _enoughData = false;
 
   int nCompletedTasks = 0;
+  int nCompletedTasksForDays = 0;
   double productivityScore = double.nan;
+
+  List<TimeSerie> addedTasksTimeSerie;
+  List<TimeSerie> completedTasksTimeSerie;
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +91,7 @@ class _StatsPageState extends State<StatsPage> {
                         child: Column(
                           children: <Widget>[
                             Text(
-                              '12',
+                              nCompletedTasksForDays.toString(),
                               style: TextStyle(fontSize: 32.0),
                             ),
                             Text(
@@ -107,7 +114,10 @@ class _StatsPageState extends State<StatsPage> {
                   child: Container(
                     height: 256.0,
                     width: double.infinity,
-                    child: SimpleTimeSeriesChart.withSampleData(),
+                    child: tasksSummaryLineChart([
+                      addedTasksTimeSerie,
+                      completedTasksTimeSerie,
+                    ]),
                   ),
                 ),
               ),
@@ -155,6 +165,53 @@ class _StatsPageState extends State<StatsPage> {
     _checkEnoughData();
   }
 
+  void _summaryData(int days) async {
+    DateTime today = DateTime.now();
+    DateTime daysFromNow = today.add(Duration(days: -7));
+
+    String sql = '''
+                 SELECT DATETIME(date) as date,
+                 SUM(${DatabaseHelper.statAdded})
+                 FROM ${DatabaseHelper.statsTable}
+                 WHERE date > '${daysFromNow.toIso8601String()}'
+                 GROUP BY date
+                 ''';
+    List<Map> output = await dbHelper.query(sql);
+    addedTasksTimeSerie = mapsToTimeSeries(output, 'SUM(added)');
+
+    sql = '''
+          SELECT DATETIME(date) as date,
+          SUM(${DatabaseHelper.statRemoved})
+          FROM ${DatabaseHelper.statsTable}
+          WHERE date > '${daysFromNow.toIso8601String()}'
+          GROUP BY date
+          ''';
+    output = await dbHelper.query(sql);
+    completedTasksTimeSerie = mapsToTimeSeries(output, 'SUM(removed)');
+
+    sql = '''
+          SELECT DATETIME(date) as date,
+          SUM(${DatabaseHelper.statRemoved})
+          FROM ${DatabaseHelper.statsTable}
+          WHERE date > '${daysFromNow.toIso8601String()}'
+          ''';
+    output = await dbHelper.query(sql);
+    nCompletedTasksForDays = output.first.values?.last;
+  }
+
+  SimpleTimeSeriesChart tasksSummaryLineChart(
+    List<List<TimeSerie>> timeSeries,
+  ) {
+    return SimpleTimeSeriesChart.fromLists(
+      ids: ['Added Tasks', 'Completed Tasks'],
+      timeSeries: timeSeries,
+      colors: [
+        charts.MaterialPalette.indigo.shadeDefault,
+        charts.MaterialPalette.pink.shadeDefault,
+      ],
+    );
+  }
+
   void _checkEnoughData() async {
     String sql =
         'SELECT SUM(${DatabaseHelper.statAdded}) FROM ${DatabaseHelper.statsTable}';
@@ -164,12 +221,13 @@ class _StatsPageState extends State<StatsPage> {
     if (this.mounted) {
       setState(() {
         _enoughData = (value == null) ? false : true;
-      });
 
-      if (_enoughData) {
-        _completedTasks();
-        _productivityIndex();
-      }
+        if (_enoughData) {
+          _completedTasks();
+          _productivityIndex();
+          _summaryData(days);
+        }
+      });
     }
   }
 
@@ -178,11 +236,7 @@ class _StatsPageState extends State<StatsPage> {
         'SELECT SUM(${DatabaseHelper.statRemoved}) FROM ${DatabaseHelper.statsTable}';
     List<Map> output = await dbHelper.query(sql);
 
-    if (this.mounted) {
-      setState(() {
-        nCompletedTasks = output.first.values?.first;
-      });
-    }
+    nCompletedTasks = output.first.values?.first;
   }
 
   void _productivityIndex() async {

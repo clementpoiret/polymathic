@@ -133,6 +133,29 @@ class SimpleTimeSeriesChart extends StatelessWidget {
 
   SimpleTimeSeriesChart(this.seriesList, {this.animate});
 
+  factory SimpleTimeSeriesChart.fromLists({
+    List<String> ids,
+    List<List<TimeSerie>> timeSeries,
+    List colors,
+  }) {
+    List<charts.Series<TimeSerie, DateTime>> series = [];
+
+    timeSeries.asMap().forEach((index, timeSerie) {
+      series.add(charts.Series<TimeSerie, DateTime>(
+        id: ids[index],
+        colorFn: (_, __) => colors[index],
+        domainFn: (TimeSerie task, _) => task.time,
+        measureFn: (TimeSerie task, _) => task.value,
+        data: timeSerie,
+      ));
+    });
+
+    return SimpleTimeSeriesChart(
+      series,
+      animate: true,
+    );
+  }
+
   factory SimpleTimeSeriesChart.withSampleData() {
     return SimpleTimeSeriesChart(
       _createSampleData(),
@@ -195,6 +218,25 @@ class SimpleTimeSeriesChart extends StatelessWidget {
       ),
     ];
   }
+}
+
+List<TimeSerie> mapsToTimeSeries(List<Map<String, dynamic>> maps, String key) {
+  List<TimeSerie> timeSeries = [];
+
+  if (maps.isNotEmpty) {
+    maps.forEach(
+      (map) {
+        timeSeries.add(
+          TimeSerie(
+            DateTime.parse(map['date']),
+            map[key],
+          ),
+        );
+      },
+    );
+  }
+
+  return timeSeries;
 }
 
 class TimeSerie {
