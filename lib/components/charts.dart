@@ -195,15 +195,15 @@ class SimpleTimeSeriesChart extends StatelessWidget {
       charts.Series<TimeSerie, DateTime>(
         id: 'Added Tasks',
         colorFn: (_, __) => charts.MaterialPalette.indigo.shadeDefault,
-        domainFn: (TimeSerie sales, _) => sales.time,
-        measureFn: (TimeSerie sales, _) => sales.value,
+        domainFn: (TimeSerie task, _) => task.time,
+        measureFn: (TimeSerie task, _) => task.value,
         data: added,
       ),
       charts.Series<TimeSerie, DateTime>(
         id: 'Completed Tasks',
         colorFn: (_, __) => charts.MaterialPalette.pink.shadeDefault,
-        domainFn: (TimeSerie sales, _) => sales.time,
-        measureFn: (TimeSerie sales, _) => sales.value,
+        domainFn: (TimeSerie task, _) => task.time,
+        measureFn: (TimeSerie task, _) => task.value,
         data: completed,
       ),
     ];
