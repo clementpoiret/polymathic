@@ -210,20 +210,27 @@ class SimpleTimeSeriesChart extends StatelessWidget {
   }
 }
 
-List<TimeSerie> mapsToTimeSeries(List<Map<String, dynamic>> maps, String key) {
-  List<TimeSerie> timeSeries = [];
+List<List<TimeSerie>> mapsToTimeSeries(
+    List<Map<String, dynamic>> maps, List<String> keys) {
+  List<List<TimeSerie>> timeSeries = [];
 
   if (maps.isNotEmpty) {
-    maps.forEach(
-      (map) {
-        timeSeries.add(
-          TimeSerie(
-            DateTime.parse(map['date']),
-            map[key],
-          ),
-        );
-      },
-    );
+    keys.forEach((key) {
+      List<TimeSerie> ts = [];
+
+      maps.forEach(
+        (map) {
+          ts.add(
+            TimeSerie(
+              DateTime.parse(map['ymdDate']),
+              map[key],
+            ),
+          );
+        },
+      );
+
+      timeSeries.add(ts);
+    });
   }
 
   return timeSeries;

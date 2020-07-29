@@ -174,34 +174,30 @@ class _StatsPageState extends State<StatsPage> {
     DateTime daysFromNow = today.add(Duration(days: -7));
 
     String sql = '''
-                 SELECT STRFTIME('%Y-%m-%d', date) as date,
-                 SUM(${DatabaseHelper.statAdded})
-                 FROM ${DatabaseHelper.statsTable}
-                 WHERE date > '${daysFromNow.toIso8601String()}'
-                 GROUP BY date
-                 ''';
-    List<Map> output = await dbHelper.query(sql);
-    setState(() {
-      addedTasksTimeSerie = mapsToTimeSeries(output, 'SUM(added)');
-    });
-
-    sql = '''
-          SELECT STRFTIME('%Y-%m-%d', date) as date,
-          SUM(${DatabaseHelper.statRemoved})
+          SELECT STRFTIME('%Y-%m-%d', date) as ymdDate,
+          SUM(${DatabaseHelper.statRemoved}),
+          SUM(${DatabaseHelper.statAdded})
           FROM ${DatabaseHelper.statsTable}
-          WHERE date > '${daysFromNow.toIso8601String()}'
-          GROUP BY date
+          WHERE ymdDate > '${daysFromNow.toIso8601String()}'
           ''';
-    output = await dbHelper.query(sql);
-    setState(() {
-      completedTasksTimeSerie = mapsToTimeSeries(output, 'SUM(removed)');
-    });
+    List<Map> output = await dbHelper.query(sql);
+    List<List<TimeSerie>> outputs = mapsToTimeSeries(output, [
+      'SUM(added)',
+      'SUM(removed)',
+    ]);
+
+    if (this.mounted) {
+      setState(() {
+        addedTasksTimeSerie = outputs[0];
+        completedTasksTimeSerie = outputs[1];
+      });
+    }
 
     sql = '''
-          SELECT STRFTIME('%Y-%m-%d', date) as date,
+          SELECT STRFTIME('%Y-%m-%d', date) as ymdDate,
           SUM(${DatabaseHelper.statRemoved})
           FROM ${DatabaseHelper.statsTable}
-          WHERE date > '${daysFromNow.toIso8601String()}'
+          WHERE ymdDate > '${daysFromNow.toIso8601String()}'
           ''';
     output = await dbHelper.query(sql);
     setState(() {
