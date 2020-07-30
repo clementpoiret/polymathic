@@ -33,11 +33,18 @@ List<OrdinalSet> mapToOrdinalSet(
   List<Map<String, dynamic>> maps,
   String key,
 ) {
-  List<OrdinalSet> ordinalSets = [];
+  List<OrdinalSet> ordinalSet = [];
 
-  maps.forEach((map) {});
+  maps.forEach((map) {
+    ordinalSet.add(
+      OrdinalSet(
+        map['ymdDate'],
+        map[key],
+      ),
+    );
+  });
 
-  return ordinalSets;
+  return ordinalSet;
 }
 
 /// Sample ordinal data type.
@@ -54,9 +61,36 @@ class SimpleGroupedBarChart extends StatelessWidget {
 
   SimpleGroupedBarChart(this.seriesList, {this.animate});
 
-  factory SimpleGroupedBarChart.withSampleData() {
+  factory SimpleGroupedBarChart.emptyGraph() {
     return SimpleGroupedBarChart(
-      _createSampleData(),
+      _createEmptyData(),
+      animate: true,
+    );
+  }
+
+  factory SimpleGroupedBarChart.fromLists({
+    List<String> ids,
+    List<List<OrdinalSet>> ordinalSets,
+    List colors,
+  }) {
+    List<charts.Series<OrdinalSet, String>> sets = [];
+
+    ordinalSets.asMap().forEach(
+      (index, ordinalSet) {
+        sets.add(
+          charts.Series<OrdinalSet, String>(
+            id: ids[index],
+            colorFn: (_, __) => colors[index],
+            domainFn: (OrdinalSet stat, _) => stat.date,
+            measureFn: (OrdinalSet stat, _) => stat.value,
+            data: ordinalSet,
+          ),
+        );
+      },
+    );
+
+    return SimpleGroupedBarChart(
+      sets,
       animate: true,
     );
   }
@@ -84,58 +118,42 @@ class SimpleGroupedBarChart extends StatelessWidget {
   }
 
   /// Create series list with multiple series
-  static List<charts.Series<OrdinalSet, String>> _createSampleData() {
-    final urgentImportantTasks = [
-      OrdinalSet('07-20', 5),
-      OrdinalSet('07-21', 25),
-      OrdinalSet('07-22', 100),
-    ];
+  static List<charts.Series<OrdinalSet, String>> _createEmptyData() {
+    final List<OrdinalSet> urgentImportantTasks = [];
 
-    final importantTasks = [
-      OrdinalSet('07-20', 10),
-      OrdinalSet('07-21', 15),
-      OrdinalSet('07-22', 50),
-    ];
+    final List<OrdinalSet> importantTasks = [];
 
-    final urgentTasks = [
-      OrdinalSet('07-20', 25),
-      OrdinalSet('07-21', 50),
-      OrdinalSet('07-22', 10),
-    ];
+    final List<OrdinalSet> urgentTasks = [];
 
-    final shitTasks = [
-      OrdinalSet('07-20', 20),
-      OrdinalSet('07-21', 35),
-      OrdinalSet('07-22', 15),
-    ];
+    final List<OrdinalSet> shitTasks = [];
 
     return [
       charts.Series<OrdinalSet, String>(
         id: 'Urg. & Imp.',
         colorFn: (_, __) => charts.MaterialPalette.pink.shadeDefault.darker,
-        domainFn: (OrdinalSet sales, _) => sales.date.toString(),
-        measureFn: (OrdinalSet sales, _) => sales.value,
+        domainFn: (OrdinalSet stat, _) => stat.date,
+        measureFn: (OrdinalSet stat, _) => stat.value,
         data: urgentImportantTasks,
       ),
       charts.Series<OrdinalSet, String>(
         id: 'Imp.',
         colorFn: (_, __) => charts.MaterialPalette.pink.shadeDefault,
-        domainFn: (OrdinalSet sales, _) => sales.date.toString(),
-        measureFn: (OrdinalSet sales, _) => sales.value,
+        domainFn: (OrdinalSet stat, _) => stat.date,
+        measureFn: (OrdinalSet stat, _) => stat.value,
         data: importantTasks,
       ),
       charts.Series<OrdinalSet, String>(
         id: 'Urg.',
         colorFn: (_, __) => charts.MaterialPalette.pink.shadeDefault.lighter,
-        domainFn: (OrdinalSet sales, _) => sales.date.toString(),
-        measureFn: (OrdinalSet sales, _) => sales.value,
+        domainFn: (OrdinalSet stat, _) => stat.date,
+        measureFn: (OrdinalSet stat, _) => stat.value,
         data: urgentTasks,
       ),
       charts.Series<OrdinalSet, String>(
         colorFn: (_, __) => charts.MaterialPalette.gray.shadeDefault,
         id: 'None',
-        domainFn: (OrdinalSet sales, _) => sales.date.toString(),
-        measureFn: (OrdinalSet sales, _) => sales.value,
+        domainFn: (OrdinalSet stat, _) => stat.date,
+        measureFn: (OrdinalSet stat, _) => stat.value,
         data: shitTasks,
       ),
     ];
@@ -150,7 +168,7 @@ class SimpleTimeSeriesChart extends StatelessWidget {
 
   factory SimpleTimeSeriesChart.emptyGraph() {
     return SimpleTimeSeriesChart(
-      _createSampleData(),
+      _createEmptyData(),
       animate: true,
     );
   }
@@ -201,7 +219,7 @@ class SimpleTimeSeriesChart extends StatelessWidget {
     );
   }
 
-  static List<charts.Series<TimeSerie, DateTime>> _createSampleData() {
+  static List<charts.Series<TimeSerie, DateTime>> _createEmptyData() {
     final List<TimeSerie> completed = [];
 
     final List<TimeSerie> added = [];

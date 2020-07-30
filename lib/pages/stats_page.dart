@@ -25,8 +25,10 @@ class _StatsPageState extends State<StatsPage> {
   double productivityScore = double.nan;
 
   bool showSummaryGraph = false;
+  bool showStatsOnTasksGraph = false;
 
   List<List<TimeSerie>> tasksSummaryTimeSeries = [];
+  List<List<OrdinalSet>> statsOnTasks = [];
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +40,10 @@ class _StatsPageState extends State<StatsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text('Statistics for the last $days days:'),
+              ),
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -130,7 +136,9 @@ class _StatsPageState extends State<StatsPage> {
                   child: Container(
                     height: 256.0,
                     width: double.infinity,
-                    child: SimpleGroupedBarChart.withSampleData(),
+                    child: showStatsOnTasksGraph
+                        ? statsOnTasksBarChart(statsOnTasks)
+                        : SimpleGroupedBarChart.emptyGraph(),
                   ),
                 ),
               ),
@@ -179,6 +187,7 @@ class _StatsPageState extends State<StatsPage> {
     setState(() {
       nCompletedTasksForDays = output.first.values?.last;
       showSummaryGraph = true;
+      showStatsOnTasksGraph = true;
     });
 
     sql = '''
@@ -200,7 +209,9 @@ class _StatsPageState extends State<StatsPage> {
       });
     }
 
-    sql = '''
+    List<List<OrdinalSet>> stats = [
+      mapToOrdinalSet(
+        await dbHelper.query('''
           SELECT STRFTIME('%Y-%m-%d', date) AS ymdDate,
             SUM(${DatabaseHelper.statRemoved})
             FROM ${DatabaseHelper.statsTable}
@@ -208,12 +219,11 @@ class _StatsPageState extends State<StatsPage> {
             AND ${DatabaseHelper.statImportant} = 1
             AND ${DatabaseHelper.statUrgent} = 1
             GROUP BY ymdDate
-          ''';
-    output = await dbHelper.query(sql);
-    //mapToOrdinalSet(output, 'SUM(removed)')
-    print(output);
-
-    sql = '''
+          '''),
+        'SUM(removed)',
+      ),
+      mapToOrdinalSet(
+        await dbHelper.query('''
           SELECT STRFTIME('%Y-%m-%d', date) AS ymdDate,
             SUM(${DatabaseHelper.statRemoved})
             FROM ${DatabaseHelper.statsTable}
@@ -221,10 +231,11 @@ class _StatsPageState extends State<StatsPage> {
             AND ${DatabaseHelper.statImportant} = 1
             AND ${DatabaseHelper.statUrgent} = 0
             GROUP BY ymdDate
-          ''';
-    output = await dbHelper.query(sql);
-
-    sql = '''
+          '''),
+        'SUM(removed)',
+      ),
+      mapToOrdinalSet(
+        await dbHelper.query('''
           SELECT STRFTIME('%Y-%m-%d', date) AS ymdDate,
             SUM(${DatabaseHelper.statRemoved})
             FROM ${DatabaseHelper.statsTable}
@@ -232,10 +243,11 @@ class _StatsPageState extends State<StatsPage> {
             AND ${DatabaseHelper.statImportant} = 0
             AND ${DatabaseHelper.statUrgent} = 1
             GROUP BY ymdDate
-          ''';
-    output = await dbHelper.query(sql);
-
-    sql = '''
+          '''),
+        'SUM(removed)',
+      ),
+      mapToOrdinalSet(
+        await dbHelper.query('''
           SELECT STRFTIME('%Y-%m-%d', date) AS ymdDate,
             SUM(${DatabaseHelper.statRemoved})
             FROM ${DatabaseHelper.statsTable}
@@ -243,8 +255,28 @@ class _StatsPageState extends State<StatsPage> {
             AND ${DatabaseHelper.statImportant} = 0
             AND ${DatabaseHelper.statUrgent} = 0
             GROUP BY ymdDate
-          ''';
-    output = await dbHelper.query(sql);
+          '''),
+        'SUM(removed)',
+      ),
+    ];
+
+    setState(() {
+      statsOnTasks = stats;
+    });
+  }
+
+  SimpleGroupedBarChart statsOnTasksBarChart(
+    List<List<OrdinalSet>> ordinalSets,
+  ) {
+    return SimpleGroupedBarChart.fromLists(
+        ids: ['Urg. & Imp.', 'Imp.', 'Urg.', 'None'],
+        ordinalSets: ordinalSets,
+        colors: [
+          charts.MaterialPalette.pink.shadeDefault.darker,
+          charts.MaterialPalette.pink.shadeDefault,
+          charts.MaterialPalette.pink.shadeDefault.lighter,
+          charts.MaterialPalette.gray.shadeDefault,
+        ]);
   }
 
   SimpleTimeSeriesChart tasksSummaryLineChart(
