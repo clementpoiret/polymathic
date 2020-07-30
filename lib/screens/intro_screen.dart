@@ -68,6 +68,8 @@ class _IntroScreenState extends State<IntroScreen> {
                 Container(
                   width: 256,
                   child: TextField(
+                    keyboardType: TextInputType.text,
+                    textCapitalization: TextCapitalization.sentences,
                     textAlign: TextAlign.center,
                     decoration: InputDecoration(
                         fillColor: kPrimaryColor,

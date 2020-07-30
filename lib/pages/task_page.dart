@@ -42,6 +42,8 @@ class _TaskPageState extends State<TaskPage> {
                       children: <Widget>[
                         Expanded(
                           child: TextField(
+                            keyboardType: TextInputType.text,
+                            textCapitalization: TextCapitalization.sentences,
                             decoration: InputDecoration(
                               labelText: 'Task',
                               border: InputBorder.none,
