@@ -51,11 +51,13 @@ class _TaskItemState extends State<TaskItem> {
                 });
 
                 if (isDone) {
-                  _delete();
-                  stat.insert();
+                  print('DELETING TASK AND ADDING STAT');
+                  _deleteTask();
+                  _insertStat();
                 } else {
-                  _reinsert();
-                  stat.delete();
+                  print('CANCEL DELETE TASK AND ADDING STAT');
+                  _reinsertTask();
+                  _deleteStat();
                 }
               },
             ),
@@ -132,7 +134,7 @@ class _TaskItemState extends State<TaskItem> {
     );
   }
 
-  void _delete() async {
+  void _deleteTask() async {
     final rowsDeleted = await dbHelper.delete(
       DatabaseHelper.tasksTable,
       widget.task['_id'],
@@ -140,11 +142,27 @@ class _TaskItemState extends State<TaskItem> {
     print('deleted $rowsDeleted task(s): task ${widget.task['_id']}');
   }
 
-  void _reinsert() async {
+  void _deleteStat() async {
+    final rowsDeleted = await dbHelper.delete(
+      DatabaseHelper.statsTable,
+      stat.id,
+    );
+    print('deleted $rowsDeleted stat(s): stat ${stat.id}');
+  }
+
+  void _reinsertTask() async {
     final id = await dbHelper.insert(
       DatabaseHelper.tasksTable,
       widget.task,
     );
     print('reinserted task: $id');
+  }
+
+  void _insertStat() async {
+    final id = await dbHelper.insert(
+      DatabaseHelper.statsTable,
+      stat.toMap(),
+    );
+    print('inserted stat: $id');
   }
 }

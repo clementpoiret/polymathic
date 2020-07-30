@@ -26,8 +26,7 @@ class _StatsPageState extends State<StatsPage> {
 
   bool showSummaryGraph = false;
 
-  List<TimeSerie> addedTasksTimeSerie = [];
-  List<TimeSerie> completedTasksTimeSerie = [];
+  List<List<TimeSerie>> tasksSummaryTimeSeries = [];
 
   @override
   Widget build(BuildContext context) {
@@ -117,10 +116,7 @@ class _StatsPageState extends State<StatsPage> {
                     height: 256.0,
                     width: double.infinity,
                     child: showSummaryGraph
-                        ? tasksSummaryLineChart([
-                            addedTasksTimeSerie,
-                            completedTasksTimeSerie,
-                          ])
+                        ? tasksSummaryLineChart(tasksSummaryTimeSeries)
                         : SimpleTimeSeriesChart.emptyGraph(),
                   ),
                 ),
@@ -174,36 +170,81 @@ class _StatsPageState extends State<StatsPage> {
     DateTime daysFromNow = today.add(Duration(days: -7));
 
     String sql = '''
-          SELECT STRFTIME('%Y-%m-%d', date) as ymdDate,
-          SUM(${DatabaseHelper.statRemoved}),
-          SUM(${DatabaseHelper.statAdded})
-          FROM ${DatabaseHelper.statsTable}
-          WHERE ymdDate > '${daysFromNow.toIso8601String()}'
-          ''';
-    List<Map> output = await dbHelper.query(sql);
-    List<List<TimeSerie>> outputs = mapsToTimeSeries(output, [
-      'SUM(added)',
-      'SUM(removed)',
-    ]);
-
-    if (this.mounted) {
-      setState(() {
-        addedTasksTimeSerie = outputs[0];
-        completedTasksTimeSerie = outputs[1];
-      });
-    }
-
-    sql = '''
-          SELECT STRFTIME('%Y-%m-%d', date) as ymdDate,
+          SELECT STRFTIME('%Y-%m-%d', date) AS ymdDate,
           SUM(${DatabaseHelper.statRemoved})
           FROM ${DatabaseHelper.statsTable}
           WHERE ymdDate > '${daysFromNow.toIso8601String()}'
           ''';
-    output = await dbHelper.query(sql);
+    List<Map> output = await dbHelper.query(sql);
     setState(() {
       nCompletedTasksForDays = output.first.values?.last;
       showSummaryGraph = true;
     });
+
+    sql = '''
+          SELECT STRFTIME('%Y-%m-%d', date) AS ymdDate,
+          SUM(${DatabaseHelper.statRemoved}) as completed,
+          SUM(${DatabaseHelper.statAdded}) as added
+          FROM ${DatabaseHelper.statsTable}
+          WHERE ymdDate > '${daysFromNow.toIso8601String()}'
+          GROUP BY ymdDate
+          ''';
+    output = await dbHelper.query(sql);
+
+    if (this.mounted) {
+      setState(() {
+        tasksSummaryTimeSeries = mapsToTimeSeries(output, [
+          'added',
+          'completed',
+        ]);
+      });
+    }
+
+    sql = '''
+          SELECT STRFTIME('%Y-%m-%d', date) AS ymdDate,
+            SUM(${DatabaseHelper.statRemoved})
+            FROM ${DatabaseHelper.statsTable}
+            WHERE ymdDate > '${daysFromNow.toIso8601String()}'
+            AND ${DatabaseHelper.statImportant} = 1
+            AND ${DatabaseHelper.statUrgent} = 1
+            GROUP BY ymdDate
+          ''';
+    output = await dbHelper.query(sql);
+    //mapToOrdinalSet(output, 'SUM(removed)')
+    print(output);
+
+    sql = '''
+          SELECT STRFTIME('%Y-%m-%d', date) AS ymdDate,
+            SUM(${DatabaseHelper.statRemoved})
+            FROM ${DatabaseHelper.statsTable}
+            WHERE ymdDate > '${daysFromNow.toIso8601String()}'
+            AND ${DatabaseHelper.statImportant} = 1
+            AND ${DatabaseHelper.statUrgent} = 0
+            GROUP BY ymdDate
+          ''';
+    output = await dbHelper.query(sql);
+
+    sql = '''
+          SELECT STRFTIME('%Y-%m-%d', date) AS ymdDate,
+            SUM(${DatabaseHelper.statRemoved})
+            FROM ${DatabaseHelper.statsTable}
+            WHERE ymdDate > '${daysFromNow.toIso8601String()}'
+            AND ${DatabaseHelper.statImportant} = 0
+            AND ${DatabaseHelper.statUrgent} = 1
+            GROUP BY ymdDate
+          ''';
+    output = await dbHelper.query(sql);
+
+    sql = '''
+          SELECT STRFTIME('%Y-%m-%d', date) AS ymdDate,
+            SUM(${DatabaseHelper.statRemoved})
+            FROM ${DatabaseHelper.statsTable}
+            WHERE ymdDate > '${daysFromNow.toIso8601String()}'
+            AND ${DatabaseHelper.statImportant} = 0
+            AND ${DatabaseHelper.statUrgent} = 0
+            GROUP BY ymdDate
+          ''';
+    output = await dbHelper.query(sql);
   }
 
   SimpleTimeSeriesChart tasksSummaryLineChart(

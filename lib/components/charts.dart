@@ -1,12 +1,51 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 
+List<List<TimeSerie>> mapsToTimeSeries(
+  List<Map<String, dynamic>> maps,
+  List<String> keys,
+) {
+  List<List<TimeSerie>> timeSeries = [];
+
+  if (maps.isNotEmpty) {
+    keys.forEach((key) {
+      List<TimeSerie> ts = [];
+
+      maps.forEach(
+        (map) {
+          ts.add(
+            TimeSerie(
+              DateTime.parse(map['ymdDate']),
+              map[key],
+            ),
+          );
+        },
+      );
+
+      timeSeries.add(ts);
+    });
+  }
+
+  return timeSeries;
+}
+
+List<OrdinalSet> mapToOrdinalSet(
+  List<Map<String, dynamic>> maps,
+  String key,
+) {
+  List<OrdinalSet> ordinalSets = [];
+
+  maps.forEach((map) {});
+
+  return ordinalSets;
+}
+
 /// Sample ordinal data type.
 class OrdinalSet {
-  final String year;
+  final String date;
   final int value;
 
-  OrdinalSet(this.year, this.value);
+  OrdinalSet(this.date, this.value);
 }
 
 class SimpleGroupedBarChart extends StatelessWidget {
@@ -47,79 +86,55 @@ class SimpleGroupedBarChart extends StatelessWidget {
   /// Create series list with multiple series
   static List<charts.Series<OrdinalSet, String>> _createSampleData() {
     final urgentImportantTasks = [
-      OrdinalSet('2014', 5),
-      OrdinalSet('2015', 25),
-      OrdinalSet('2016', 100),
-      OrdinalSet('2017', 75),
-      OrdinalSet('2018', 75),
-      OrdinalSet('2019', 75),
-      OrdinalSet('2020', 75),
-      OrdinalSet('2021', 75),
-      OrdinalSet('2022', 75),
+      OrdinalSet('07-20', 5),
+      OrdinalSet('07-21', 25),
+      OrdinalSet('07-22', 100),
     ];
 
     final importantTasks = [
-      OrdinalSet('2014', 10),
-      OrdinalSet('2015', 15),
-      OrdinalSet('2016', 50),
-      OrdinalSet('2017', 45),
-      OrdinalSet('2018', 75),
-      OrdinalSet('2019', 75),
-      OrdinalSet('2020', 75),
-      OrdinalSet('2021', 75),
-      OrdinalSet('2022', 75),
+      OrdinalSet('07-20', 10),
+      OrdinalSet('07-21', 15),
+      OrdinalSet('07-22', 50),
     ];
 
     final urgentTasks = [
-      OrdinalSet('2014', 25),
-      OrdinalSet('2015', 50),
-      OrdinalSet('2016', 10),
-      OrdinalSet('2017', 20),
-      OrdinalSet('2018', 75),
-      OrdinalSet('2019', 75),
-      OrdinalSet('2020', 75),
-      OrdinalSet('2021', 75),
-      OrdinalSet('2022', 75),
+      OrdinalSet('07-20', 25),
+      OrdinalSet('07-21', 50),
+      OrdinalSet('07-22', 10),
     ];
 
     final shitTasks = [
-      OrdinalSet('2014', 20),
-      OrdinalSet('2015', 35),
-      OrdinalSet('2016', 15),
-      OrdinalSet('2017', 10),
-      OrdinalSet('2018', 75),
-      OrdinalSet('2019', 75),
-      OrdinalSet('2020', 75),
-      OrdinalSet('2021', 75),
-      OrdinalSet('2022', 75),
+      OrdinalSet('07-20', 20),
+      OrdinalSet('07-21', 35),
+      OrdinalSet('07-22', 15),
     ];
 
     return [
       charts.Series<OrdinalSet, String>(
         id: 'Urg. & Imp.',
         colorFn: (_, __) => charts.MaterialPalette.pink.shadeDefault.darker,
-        domainFn: (OrdinalSet sales, _) => sales.year,
+        domainFn: (OrdinalSet sales, _) => sales.date.toString(),
         measureFn: (OrdinalSet sales, _) => sales.value,
         data: urgentImportantTasks,
       ),
       charts.Series<OrdinalSet, String>(
         id: 'Imp.',
         colorFn: (_, __) => charts.MaterialPalette.pink.shadeDefault,
-        domainFn: (OrdinalSet sales, _) => sales.year,
+        domainFn: (OrdinalSet sales, _) => sales.date.toString(),
         measureFn: (OrdinalSet sales, _) => sales.value,
         data: importantTasks,
       ),
       charts.Series<OrdinalSet, String>(
         id: 'Urg.',
         colorFn: (_, __) => charts.MaterialPalette.pink.shadeDefault.lighter,
-        domainFn: (OrdinalSet sales, _) => sales.year,
+        domainFn: (OrdinalSet sales, _) => sales.date.toString(),
         measureFn: (OrdinalSet sales, _) => sales.value,
         data: urgentTasks,
       ),
       charts.Series<OrdinalSet, String>(
         colorFn: (_, __) => charts.MaterialPalette.gray.shadeDefault,
         id: 'None',
-        domainFn: (OrdinalSet sales, _) => sales.year,
+        domainFn: (OrdinalSet sales, _) => sales.date.toString(),
         measureFn: (OrdinalSet sales, _) => sales.value,
         data: shitTasks,
       ),
@@ -132,6 +147,13 @@ class SimpleTimeSeriesChart extends StatelessWidget {
   final bool animate;
 
   SimpleTimeSeriesChart(this.seriesList, {this.animate});
+
+  factory SimpleTimeSeriesChart.emptyGraph() {
+    return SimpleTimeSeriesChart(
+      _createSampleData(),
+      animate: true,
+    );
+  }
 
   factory SimpleTimeSeriesChart.fromLists({
     List<String> ids,
@@ -152,13 +174,6 @@ class SimpleTimeSeriesChart extends StatelessWidget {
 
     return SimpleTimeSeriesChart(
       series,
-      animate: true,
-    );
-  }
-
-  factory SimpleTimeSeriesChart.emptyGraph() {
-    return SimpleTimeSeriesChart(
-      _createSampleData(),
       animate: true,
     );
   }
@@ -208,32 +223,6 @@ class SimpleTimeSeriesChart extends StatelessWidget {
       ),
     ];
   }
-}
-
-List<List<TimeSerie>> mapsToTimeSeries(
-    List<Map<String, dynamic>> maps, List<String> keys) {
-  List<List<TimeSerie>> timeSeries = [];
-
-  if (maps.isNotEmpty) {
-    keys.forEach((key) {
-      List<TimeSerie> ts = [];
-
-      maps.forEach(
-        (map) {
-          ts.add(
-            TimeSerie(
-              DateTime.parse(map['ymdDate']),
-              map[key],
-            ),
-          );
-        },
-      );
-
-      timeSeries.add(ts);
-    });
-  }
-
-  return timeSeries;
 }
 
 class TimeSerie {

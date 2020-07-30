@@ -82,7 +82,7 @@ class _TaskPageState extends State<TaskPage> {
                                 added: 1,
                                 removed: 0,
                               );
-                              stat.insert();
+                              _insertStat(stat);
                               _onPressAddButton(task);
                               setState(() {
                                 _isAddTaskVisible = false;
@@ -216,15 +216,21 @@ class _TaskPageState extends State<TaskPage> {
     }
   }
 
-  void _insert(Task task) async {
+  void _insertTask(Task task) async {
     Map<String, dynamic> row = task.toMap();
     final id = await dbHelper.insert(DatabaseHelper.tasksTable, row);
     print('inserted task: $id');
   }
 
+  void _insertStat(Stat stat) async {
+    Map<String, dynamic> row = stat.toMap();
+    final id = await dbHelper.insert(DatabaseHelper.statsTable, row);
+    print('inserted stat: $id');
+  }
+
   void _onPressAddButton(Task task) {
     print(task.toMap());
-    _insert(task);
+    _insertTask(task);
     _query();
     _isAddable = false;
     isImportant = false;

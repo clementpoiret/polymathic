@@ -47,20 +47,20 @@ class Stat {
     this.removed,
   });
 
-  void delete() async {
-    final rowsDeleted = await dbHelper.delete(
-      DatabaseHelper.statsTable,
-      id,
-    );
-    print('deleted $rowsDeleted stat(s): stat $id');
-  }
+  // void delete() async {
+  //   final rowsDeleted = await dbHelper.delete(
+  //     DatabaseHelper.statsTable,
+  //     id,
+  //   );
+  //   print('deleted $rowsDeleted stat(s): stat $id');
+  // }
 
-  void insert() async {
-    Map<String, dynamic> row = toMap();
-    print(row);
-    id = await dbHelper.insert(DatabaseHelper.statsTable, row);
-    print('inserted stat: $id');
-  }
+  // void insert() async {
+  //   Map<String, dynamic> row = toMap();
+  //   print(row);
+  //   id = await dbHelper.insert(DatabaseHelper.statsTable, row);
+  //   print('inserted stat: $id');
+  // }
 
   Map<String, dynamic> toMap() {
     return {
