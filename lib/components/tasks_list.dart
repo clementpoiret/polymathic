@@ -4,10 +4,12 @@ import 'package:polymathic/components/task_item.dart';
 import 'package:polymathic/utils/task.dart';
 
 class TasksList extends StatefulWidget {
+  final Function notifyParent;
   final List<Map<String, dynamic>> taskList;
 
   const TasksList({
     Key key,
+    @required this.notifyParent,
     @required this.taskList,
   }) : super(key: key);
 
@@ -38,7 +40,11 @@ class _TasksListState extends State<TasksList> {
         visible: _isListVisible,
         child: ListView(
           children: <Widget>[
-            for (var task in sortTasks(widget.taskList)) TaskItem(task: task),
+            for (var task in sortTasks(widget.taskList))
+              TaskItem(
+                task: task,
+                notifyParent: widget.notifyParent,
+              ),
           ],
         ),
         replacement: Column(

@@ -67,10 +67,10 @@ class _TaskPageState extends State<TaskPage> {
                           child: RawMaterialButton(
                             child: Icon(
                               MaterialIcons.add,
-                              color: kPrimaryColor,
+                              color: kAccentColor,
                             ),
                             shape: CircleBorder(
-                              side: BorderSide(color: kPrimaryColor),
+                              side: BorderSide(color: kAccentColor),
                             ),
                             onPressed: () {
                               Task task = Task(
@@ -167,6 +167,7 @@ class _TaskPageState extends State<TaskPage> {
           ),
           TasksList(
             taskList: taskList,
+            notifyParent: query,
           ),
         ],
       ),
@@ -176,7 +177,7 @@ class _TaskPageState extends State<TaskPage> {
   @override
   void initState() {
     super.initState();
-    _query();
+    query();
   }
 
   void ivyLeeCheck() {
@@ -218,10 +219,14 @@ class _TaskPageState extends State<TaskPage> {
     }
   }
 
-  void _insertTask(Task task) async {
-    Map<String, dynamic> row = task.toMap();
-    final id = await dbHelper.insert(DatabaseHelper.tasksTable, row);
-    print('inserted task: $id');
+  void query() async {
+    final allRows = await dbHelper.queryAllRows(DatabaseHelper.tasksTable);
+    final rowCount = await dbHelper.queryRowCount(DatabaseHelper.tasksTable);
+
+    setState(() {
+      taskList = allRows;
+      nTasks = rowCount;
+    });
   }
 
   void _insertStat(Stat stat) async {
@@ -230,22 +235,18 @@ class _TaskPageState extends State<TaskPage> {
     print('inserted stat: $id');
   }
 
+  void _insertTask(Task task) async {
+    Map<String, dynamic> row = task.toMap();
+    final id = await dbHelper.insert(DatabaseHelper.tasksTable, row);
+    print('inserted task: $id');
+  }
+
   void _onPressAddButton(Task task) {
     print(task.toMap());
     _insertTask(task);
-    _query();
+    query();
     _isAddable = false;
     isImportant = false;
     isUrgent = false;
-  }
-
-  void _query() async {
-    final allRows = await dbHelper.queryAllRows(DatabaseHelper.tasksTable);
-    final rowCount = await dbHelper.queryRowCount(DatabaseHelper.tasksTable);
-
-    setState(() {
-      taskList = allRows;
-      nTasks = rowCount;
-    });
   }
 }

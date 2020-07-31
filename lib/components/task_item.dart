@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:polymathic/components/tag.dart';
 import 'package:polymathic/helpers/database.dart';
-import 'package:polymathic/utils/constants.dart';
-import 'package:polymathic/utils/task.dart';
 import 'package:polymathic/utils/stat.dart';
+import 'package:polymathic/utils/task.dart';
 
 class TaskItem extends StatefulWidget {
+  final Function notifyParent;
   final Map<String, dynamic> task;
 
   const TaskItem({
     Key key,
     @required this.task,
+    @required this.notifyParent,
   }) : super(key: key);
 
   @override
@@ -18,21 +20,9 @@ class TaskItem extends StatefulWidget {
 }
 
 class _TaskItemState extends State<TaskItem> {
-  bool isDone = false;
   Stat stat;
 
   final dbHelper = DatabaseHelper.instance;
-
-  @override
-  void initState() {
-    super.initState();
-    stat = Stat(
-      important: widget.task['important'],
-      urgent: widget.task['urgent'],
-      added: 0,
-      removed: 1,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,24 +32,33 @@ class _TaskItemState extends State<TaskItem> {
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: <Widget>[
-            Checkbox(
-              activeColor: kPrimaryColor,
-              value: isDone,
-              onChanged: (value) {
-                setState(() {
-                  isDone = value;
-                });
-
-                if (isDone) {
-                  print('DELETING TASK AND ADDING STAT');
-                  _deleteTask();
-                  _insertStat();
-                } else {
-                  print('CANCEL DELETE TASK AND ADDING STAT');
-                  _reinsertTask();
-                  _deleteStat();
-                }
-              },
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 4.0),
+                  child: InkWell(
+                    child: Icon(
+                      Ionicons.md_done_all,
+                    ),
+                    onTap: () {
+                      confirmCompletion();
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0.0, 4.0, 8.0, 0.0),
+                  child: InkWell(
+                    child: Icon(
+                      Ionicons.md_remove_circle_outline,
+                    ),
+                    onTap: () {
+                      confirmDeletion();
+                    },
+                  ),
+                ),
+              ],
             ),
             Container(
               height: 32.0,
@@ -74,29 +73,17 @@ class _TaskItemState extends State<TaskItem> {
                 children: <Widget>[
                   Text(
                     widget.task['content'],
-                    style: isDone
-                        ? TextStyle(
-                            fontSize: 16,
-                            decoration: TextDecoration.lineThrough,
-                            color: Colors.grey,
-                          )
-                        : TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16),
                   ),
                   SizedBox(
                     height: 4.0,
                   ),
                   Text(
                     getAdvice(widget.task),
-                    style: isDone
-                        ? TextStyle(
-                            fontStyle: FontStyle.italic,
-                            color: Colors.grey,
-                            decoration: TextDecoration.lineThrough,
-                          )
-                        : TextStyle(
-                            fontStyle: FontStyle.italic,
-                            color: Colors.grey,
-                          ),
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey,
+                    ),
                   ),
                   if (widget.task['important'] == 1 ||
                       widget.task['urgent'] == 1)
@@ -134,12 +121,94 @@ class _TaskItemState extends State<TaskItem> {
     );
   }
 
-  void _deleteTask() async {
-    final rowsDeleted = await dbHelper.delete(
-      DatabaseHelper.tasksTable,
-      widget.task['_id'],
+  void completeTask({Function onComplete}) {
+    print('DELETING TASK AND ADDING STAT');
+    _deleteTask();
+    _insertStat();
+    onComplete();
+  }
+
+  void confirmCompletion() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Did you finish that task?'),
+          content: Text(
+              'You are about to mark it as completed. This completion will be added to your statistical reports.'),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            FlatButton(
+              child: Text("CANCEL"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text("CONTINUE"),
+              onPressed: () {
+                completeTask(onComplete: widget.notifyParent);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
-    print('deleted $rowsDeleted task(s): task ${widget.task['_id']}');
+  }
+
+  void confirmDeletion() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Remove that task?'),
+          content: Text(
+              'You are about to remove the task. It will no longer appear in your statistics.'),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            FlatButton(
+              child: Text("CANCEL"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text("CONTINUE"),
+              onPressed: () {
+                removeTask(onComplete: widget.notifyParent);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    stat = Stat(
+      important: widget.task['important'],
+      urgent: widget.task['urgent'],
+      added: 0,
+      removed: 1,
+    );
+  }
+
+  void removeTask({Function onComplete}) {
+    print('REMOVING TASK AND ADDING STAT');
+    stat = Stat(
+      important: widget.task['important'],
+      urgent: widget.task['urgent'],
+      added: -1,
+      removed: 0,
+    );
+
+    _deleteTask();
+    _insertStat();
+    onComplete();
   }
 
   void _deleteStat() async {
@@ -150,12 +219,12 @@ class _TaskItemState extends State<TaskItem> {
     print('deleted $rowsDeleted stat(s): stat ${stat.id}');
   }
 
-  void _reinsertTask() async {
-    final id = await dbHelper.insert(
+  void _deleteTask() async {
+    final rowsDeleted = await dbHelper.delete(
       DatabaseHelper.tasksTable,
-      widget.task,
+      widget.task['_id'],
     );
-    print('reinserted task: $id');
+    print('deleted $rowsDeleted task(s): task ${widget.task['_id']}');
   }
 
   void _insertStat() async {
@@ -164,5 +233,13 @@ class _TaskItemState extends State<TaskItem> {
       stat.toMap(),
     );
     print('inserted stat: $id');
+  }
+
+  void _reinsertTask() async {
+    final id = await dbHelper.insert(
+      DatabaseHelper.tasksTable,
+      widget.task,
+    );
+    print('reinserted task: $id');
   }
 }

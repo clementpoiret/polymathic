@@ -1,11 +1,11 @@
 import 'dart:ffi';
 
+import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:polymathic/components/charts.dart';
 import 'package:polymathic/helpers/database.dart';
 import 'package:polymathic/utils/stat.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
 
 class StatsPage extends StatefulWidget {
   @override
@@ -117,9 +117,9 @@ class _StatsPageState extends State<StatsPage> {
               ),
               Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Container(
-                    height: 256.0,
+                    height: 200.0,
                     width: double.infinity,
                     child: showSummaryGraph
                         ? tasksSummaryLineChart(tasksSummaryTimeSeries)
@@ -132,9 +132,9 @@ class _StatsPageState extends State<StatsPage> {
               ),
               Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Container(
-                    height: 256.0,
+                    height: 200.0,
                     width: double.infinity,
                     child: showStatsOnTasksGraph
                         ? statsOnTasksBarChart(statsOnTasks)
@@ -171,6 +171,120 @@ class _StatsPageState extends State<StatsPage> {
     super.initState();
 
     _checkEnoughData();
+  }
+
+  SimpleGroupedBarChart statsOnTasksBarChart(
+    List<List<OrdinalSet>> ordinalSets,
+  ) {
+    return SimpleGroupedBarChart.fromLists(
+        ids: ['Urg. & Imp.', 'Imp.', 'Urg.', 'None'],
+        ordinalSets: ordinalSets,
+        colors: [
+          charts.MaterialPalette.pink.shadeDefault.darker,
+          charts.MaterialPalette.pink.shadeDefault,
+          charts.MaterialPalette.pink.shadeDefault.lighter,
+          charts.MaterialPalette.gray.shadeDefault,
+        ]);
+  }
+
+  SimpleTimeSeriesChart tasksSummaryLineChart(
+    List<List<TimeSerie>> timeSeries,
+  ) {
+    return SimpleTimeSeriesChart.fromLists(
+      ids: ['Added Tasks', 'Completed Tasks'],
+      timeSeries: timeSeries,
+      colors: [
+        charts.MaterialPalette.indigo.shadeDefault,
+        charts.MaterialPalette.pink.shadeDefault,
+      ],
+    );
+  }
+
+  void _checkEnoughData() async {
+    String sql = '''
+          SELECT STRFTIME('%Y-%m-%d', date) AS ymdDate
+          FROM ${DatabaseHelper.statsTable}
+          GROUP BY ymdDate
+          ''';
+    List<Map> output = await dbHelper.query(sql);
+    int value = output.length;
+
+    if (this.mounted) {
+      setState(() {
+        _enoughData = (value < 2) ? false : true;
+      });
+
+      if (_enoughData) {
+        _completedTasks();
+        _productivityIndex();
+        _summaryData(days);
+      }
+    }
+  }
+
+  void _completedTasks() async {
+    String sql =
+        'SELECT SUM(${DatabaseHelper.statRemoved}) FROM ${DatabaseHelper.statsTable}';
+    List<Map> output = await dbHelper.query(sql);
+
+    if (this.mounted) {
+      setState(() {
+        nCompletedTasks = output.first.values?.first;
+      });
+    }
+  }
+
+  void _productivityIndex() async {
+    int nUrgentImportantAdded = await dbHelper.getAddedTasks(
+      isUrgent: 1,
+      isImportant: 1,
+    );
+    int nUrgentAdded = await dbHelper.getAddedTasks(
+      isUrgent: 1,
+      isImportant: 0,
+    );
+    int nImportantAdded = await dbHelper.getAddedTasks(
+      isUrgent: 0,
+      isImportant: 1,
+    );
+    int nNoneAdded = await dbHelper.getAddedTasks(
+      isUrgent: 0,
+      isImportant: 0,
+    );
+
+    int nUrgentImportantCompleted = await dbHelper.getRemovedTasks(
+      isUrgent: 1,
+      isImportant: 1,
+    );
+    int nUrgentCompleted = await dbHelper.getRemovedTasks(
+      isUrgent: 1,
+      isImportant: 0,
+    );
+    int nImportantCompleted = await dbHelper.getRemovedTasks(
+      isUrgent: 0,
+      isImportant: 1,
+    );
+    int nNoneCompleted = await dbHelper.getRemovedTasks(
+      isUrgent: 0,
+      isImportant: 0,
+    );
+
+    double index = getProductivityIndex(
+      nUrgentImportantAdded: nUrgentImportantAdded,
+      nImportantAdded: nImportantAdded,
+      nUrgentAdded: nUrgentAdded,
+      nNoneAdded: nNoneAdded,
+      nUrgentImportantCompleted: nUrgentImportantCompleted,
+      nImportantCompleted: nImportantCompleted,
+      nUrgentCompleted: nUrgentCompleted,
+      nNoneCompleted: nNoneCompleted,
+    );
+
+    if (this.mounted) {
+      setState(() {
+        productivityScore = index;
+      });
+    }
   }
 
   void _summaryData(int days) async {
@@ -263,116 +377,5 @@ class _StatsPageState extends State<StatsPage> {
     setState(() {
       statsOnTasks = stats;
     });
-  }
-
-  SimpleGroupedBarChart statsOnTasksBarChart(
-    List<List<OrdinalSet>> ordinalSets,
-  ) {
-    return SimpleGroupedBarChart.fromLists(
-        ids: ['Urg. & Imp.', 'Imp.', 'Urg.', 'None'],
-        ordinalSets: ordinalSets,
-        colors: [
-          charts.MaterialPalette.pink.shadeDefault.darker,
-          charts.MaterialPalette.pink.shadeDefault,
-          charts.MaterialPalette.pink.shadeDefault.lighter,
-          charts.MaterialPalette.gray.shadeDefault,
-        ]);
-  }
-
-  SimpleTimeSeriesChart tasksSummaryLineChart(
-    List<List<TimeSerie>> timeSeries,
-  ) {
-    return SimpleTimeSeriesChart.fromLists(
-      ids: ['Added Tasks', 'Completed Tasks'],
-      timeSeries: timeSeries,
-      colors: [
-        charts.MaterialPalette.indigo.shadeDefault,
-        charts.MaterialPalette.pink.shadeDefault,
-      ],
-    );
-  }
-
-  void _checkEnoughData() async {
-    String sql =
-        'SELECT SUM(${DatabaseHelper.statAdded}) FROM ${DatabaseHelper.statsTable}';
-    List<Map> output = await dbHelper.query(sql);
-    int value = output.first.values?.first;
-
-    if (this.mounted) {
-      setState(() {
-        _enoughData = (value == null) ? false : true;
-      });
-
-      if (_enoughData) {
-        _completedTasks();
-        _productivityIndex();
-        _summaryData(days);
-      }
-    }
-  }
-
-  void _completedTasks() async {
-    String sql =
-        'SELECT SUM(${DatabaseHelper.statRemoved}) FROM ${DatabaseHelper.statsTable}';
-    List<Map> output = await dbHelper.query(sql);
-
-    if (this.mounted) {
-      setState(() {
-        nCompletedTasks = output.first.values?.first;
-      });
-    }
-  }
-
-  void _productivityIndex() async {
-    int nUrgentImportantAdded = await dbHelper.getAddedTasks(
-      isUrgent: 1,
-      isImportant: 1,
-    );
-    int nUrgentAdded = await dbHelper.getAddedTasks(
-      isUrgent: 1,
-      isImportant: 0,
-    );
-    int nImportantAdded = await dbHelper.getAddedTasks(
-      isUrgent: 0,
-      isImportant: 1,
-    );
-    int nNoneAdded = await dbHelper.getAddedTasks(
-      isUrgent: 0,
-      isImportant: 0,
-    );
-
-    int nUrgentImportantCompleted = await dbHelper.getRemovedTasks(
-      isUrgent: 1,
-      isImportant: 1,
-    );
-    int nUrgentCompleted = await dbHelper.getRemovedTasks(
-      isUrgent: 1,
-      isImportant: 0,
-    );
-    int nImportantCompleted = await dbHelper.getRemovedTasks(
-      isUrgent: 0,
-      isImportant: 1,
-    );
-    int nNoneCompleted = await dbHelper.getRemovedTasks(
-      isUrgent: 0,
-      isImportant: 0,
-    );
-
-    double index = getProductivityIndex(
-      nUrgentImportantAdded: nUrgentImportantAdded,
-      nImportantAdded: nImportantAdded,
-      nUrgentAdded: nUrgentAdded,
-      nNoneAdded: nNoneAdded,
-      nUrgentImportantCompleted: nUrgentImportantCompleted,
-      nImportantCompleted: nImportantCompleted,
-      nUrgentCompleted: nUrgentCompleted,
-      nNoneCompleted: nNoneCompleted,
-    );
-
-    if (this.mounted) {
-      setState(() {
-        productivityScore = index;
-      });
-    }
   }
 }

@@ -38,7 +38,7 @@ List<OrdinalSet> mapToOrdinalSet(
   maps.forEach((map) {
     ordinalSet.add(
       OrdinalSet(
-        map['ymdDate'],
+        map['ymdDate'].toString().substring(5),
         map[key],
       ),
     );
