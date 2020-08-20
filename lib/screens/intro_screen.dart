@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+// import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:polymathic/utils/constants.dart';
@@ -57,11 +57,11 @@ class _IntroScreenState extends State<IntroScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                SvgPicture.asset(
-                  _introSvg,
-                  height: 256,
-                  semanticsLabel: 'Introduction Image',
-                ),
+                // SvgPicture.asset(
+                //   _introSvg,
+                //   height: 256,
+                //   semanticsLabel: 'Introduction Image',
+                // ),
                 SizedBox(
                   height: 64,
                 ),

@@ -1,0 +1,21 @@
+name: polymathic
+version: 0.0.2
+summary: Not your average task manager
+description: Not your average task manager, bringing you productivity.
+
+confinement: strict
+base: core18
+grade: stable
+
+apps:
+  polymathic:
+    command: main
+    extensions: [flutter-dev]
+    plugs:
+    - network
+
+parts:
+  polymathic:
+    source: .
+    plugin: flutter
+    flutter-target: lib/main.dart

@@ -1,4 +1,4 @@
-package com.example.polymathic
+package com.clementpoiret.polymathic
 
 import io.flutter.embedding.android.FlutterActivity
 

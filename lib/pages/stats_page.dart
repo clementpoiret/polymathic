@@ -1,8 +1,8 @@
-import 'dart:ffi';
+// import 'dart:ffi';
 
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+// import 'package:flutter_svg/flutter_svg.dart';
 import 'package:polymathic/components/charts.dart';
 import 'package:polymathic/helpers/database.dart';
 import 'package:polymathic/utils/stat.dart';
@@ -148,11 +148,11 @@ class _StatsPageState extends State<StatsPage> {
         replacement: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SvgPicture.asset(
-              _noDataSvg,
-              height: 256,
-              semanticsLabel: 'No data',
-            ),
+            // SvgPicture.asset(
+            //   _noDataSvg,
+            //   height: 256,
+            //   semanticsLabel: 'No data',
+            // ),
             SizedBox(
               height: 16.0,
             ),
@@ -208,6 +208,8 @@ class _StatsPageState extends State<StatsPage> {
           ''';
     List<Map> output = await dbHelper.query(sql);
     int value = output.length;
+
+    value = 2;
 
     if (this.mounted) {
       setState(() {

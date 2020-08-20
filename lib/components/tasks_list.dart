@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+// import 'package:flutter_svg/flutter_svg.dart';
 import 'package:polymathic/components/task_item.dart';
 import 'package:polymathic/utils/task.dart';
 
@@ -50,11 +50,11 @@ class _TasksListState extends State<TasksList> {
         replacement: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SvgPicture.asset(
-              _emptySvg,
-              height: 256,
-              semanticsLabel: 'No tasks',
-            ),
+            // SvgPicture.asset(
+            //   _emptySvg,
+            //   height: 256,
+            //   semanticsLabel: 'No tasks',
+            // ),
             SizedBox(
               height: 16.0,
             ),
