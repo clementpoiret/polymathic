@@ -2,9 +2,10 @@
 
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
-// import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:polymathic/components/charts.dart';
 import 'package:polymathic/helpers/database.dart';
+import 'package:polymathic/i18n/strings.g.dart' show t;
 import 'package:polymathic/utils/stat.dart';
 
 class StatsPage extends StatefulWidget {
@@ -42,7 +43,7 @@ class _StatsPageState extends State<StatsPage> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text('Statistics for the last $days days:'),
+                child: Text(t.statsForXDays(n: days)),
               ),
               Card(
                 child: Padding(
@@ -54,7 +55,7 @@ class _StatsPageState extends State<StatsPage> {
                         style: TextStyle(fontSize: 32.0),
                       ),
                       Text(
-                        'Completed Tasks',
+                        t.completedTasks,
                         style: TextStyle(fontSize: 12.0),
                       ),
                     ],
@@ -79,7 +80,7 @@ class _StatsPageState extends State<StatsPage> {
                               style: TextStyle(fontSize: 32.0),
                             ),
                             Text(
-                              'Productivity Index (/100)',
+                              t.productivityIndex,
                               style: TextStyle(fontSize: 12.0),
                             ),
                           ],
@@ -102,7 +103,7 @@ class _StatsPageState extends State<StatsPage> {
                               style: TextStyle(fontSize: 32.0),
                             ),
                             Text(
-                              'Completed Tasks ($days days)',
+                              t.completedTasksForXDays(n: days),
                               style: TextStyle(fontSize: 12.0),
                             ),
                           ],
@@ -148,11 +149,11 @@ class _StatsPageState extends State<StatsPage> {
         replacement: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // SvgPicture.asset(
-            //   _noDataSvg,
-            //   height: 256,
-            //   semanticsLabel: 'No data',
-            // ),
+            SvgPicture.asset(
+              _noDataSvg,
+              height: 256,
+              semanticsLabel: 'No data',
+            ),
             SizedBox(
               height: 16.0,
             ),
@@ -177,7 +178,12 @@ class _StatsPageState extends State<StatsPage> {
     List<List<OrdinalSet>> ordinalSets,
   ) {
     return SimpleGroupedBarChart.fromLists(
-        ids: ['Urg. & Imp.', 'Imp.', 'Urg.', 'None'],
+        ids: [
+          t.urgentAndImportantAbr,
+          t.importantAbr,
+          t.urgentAbr,
+          t.noneAbr,
+        ],
         ordinalSets: ordinalSets,
         colors: [
           charts.MaterialPalette.pink.shadeDefault.darker,
@@ -191,7 +197,7 @@ class _StatsPageState extends State<StatsPage> {
     List<List<TimeSerie>> timeSeries,
   ) {
     return SimpleTimeSeriesChart.fromLists(
-      ids: ['Added Tasks', 'Completed Tasks'],
+      ids: ['Added Tasks', t.completedTasks],
       timeSeries: timeSeries,
       colors: [
         charts.MaterialPalette.indigo.shadeDefault,

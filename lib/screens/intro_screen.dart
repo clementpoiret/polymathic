@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-// import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:polymathic/i18n/strings.g.dart' show t;
+import 'package:polymathic/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:polymathic/utils/constants.dart';
 import 'main_screen.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -17,7 +18,6 @@ class _IntroScreenState extends State<IntroScreen> {
   String name = 'undefined';
 
   void saveName(String name) async {
-    print('Saved name to SharedPreferences');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('name', name);
     await prefs.setBool('firstLaunch', false);
@@ -36,7 +36,7 @@ class _IntroScreenState extends State<IntroScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  'Welcome to',
+                  t.welcome,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20,
@@ -57,17 +57,22 @@ class _IntroScreenState extends State<IntroScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                // SvgPicture.asset(
-                //   _introSvg,
-                //   height: 256,
-                //   semanticsLabel: 'Introduction Image',
-                // ),
+                SvgPicture.asset(
+                  _introSvg,
+                  height: 256,
+                  semanticsLabel: 'Introduction Image',
+                ),
                 SizedBox(
                   height: 64,
                 ),
                 Container(
                   width: 256,
                   child: TextField(
+                    autofillHints: [
+                      AutofillHints.givenName,
+                      AutofillHints.name,
+                      AutofillHints.nickname
+                    ],
                     keyboardType: TextInputType.text,
                     textCapitalization: TextCapitalization.sentences,
                     textAlign: TextAlign.center,
@@ -102,7 +107,7 @@ class _IntroScreenState extends State<IntroScreen> {
                           ),
                         ),
                         hintStyle: TextStyle(color: Colors.white54),
-                        hintText: 'What\'s your name?'),
+                        hintText: t.askName),
                     style: TextStyle(color: Colors.white),
                     onChanged: (value) {
                       name = value;

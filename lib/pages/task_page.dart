@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:polymathic/components/tasks_list.dart';
 import 'package:polymathic/helpers/database.dart';
+import 'package:polymathic/i18n/strings.g.dart' show t;
 import 'package:polymathic/utils/constants.dart';
 import 'package:polymathic/utils/stat.dart';
 import 'package:polymathic/utils/task.dart';
@@ -45,9 +46,9 @@ class _TaskPageState extends State<TaskPage> {
                             keyboardType: TextInputType.text,
                             textCapitalization: TextCapitalization.sentences,
                             decoration: InputDecoration(
-                              labelText: 'Task',
+                              labelText: t.tasks,
                               border: InputBorder.none,
-                              hintText: 'Enter your task here',
+                              hintText: t.enterYourTask,
                             ),
                             onChanged: (value) {
                               taskContent = value;
@@ -102,7 +103,7 @@ class _TaskPageState extends State<TaskPage> {
                         SwitchListTile(
                           activeColor: kPrimaryColor,
                           value: isImportant,
-                          title: Text('Important task'),
+                          title: Text(t.importantTask),
                           onChanged: (bool value) {
                             setState(() {
                               isImportant = value;
@@ -112,7 +113,7 @@ class _TaskPageState extends State<TaskPage> {
                         SwitchListTile(
                           activeColor: kPrimaryColor,
                           value: isUrgent,
-                          title: Text('Urgent task'),
+                          title: Text(t.urgentTask),
                           onChanged: (bool value) {
                             setState(() {
                               isUrgent = value;
@@ -153,7 +154,7 @@ class _TaskPageState extends State<TaskPage> {
                         },
                       ),
                       Text(
-                        'Add a new task',
+                        t.addTask,
                         style: TextStyle(fontSize: 16.0),
                       ),
                     ],
@@ -194,19 +195,22 @@ class _TaskPageState extends State<TaskPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Wow, that\'s a lot!'),
+            title: Text(t.taskWarningTitle),
             content: Text(
-                'You already have 6 scheduled tasks for today.\nAccording to the Ivy Lee Method for productivity, you should focus on those 6 tasks before adding more.'),
+              t.taskWarningText,
+            ),
             actions: <Widget>[
               // usually buttons at the bottom of the dialog
               FlatButton(
-                child: Text("CANCEL"),
+                child: Text(
+                  t.cancel.toUpperCase(),
+                ),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               FlatButton(
-                child: Text("PROCEED ANYWAY"),
+                child: Text(t.proceedAnyway.toUpperCase()),
                 onPressed: () {
                   _showForm();
                   Navigator.of(context).pop();

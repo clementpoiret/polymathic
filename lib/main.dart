@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'i18n/strings.g.dart';
 import 'screens/intro_screen.dart';
 import 'screens/main_screen.dart';
 import 'utils/constants.dart';
@@ -56,6 +57,10 @@ class _FirstLaunchState extends State<FirstLaunch> {
   @override
   void initState() {
     super.initState();
+
+    LocaleSettings.useDeviceLocale().whenComplete(() {
+      setState(() {});
+    });
     checkFirstLaunch();
   }
 

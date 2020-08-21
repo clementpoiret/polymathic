@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:polymathic/components/tabbar_navigation.dart';
+import 'package:polymathic/i18n/strings.g.dart' show t;
 import 'package:polymathic/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -53,7 +54,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               Padding(
                 padding: const EdgeInsets.fromLTRB(14, 0, 0, 0),
                 child: Text(
-                  'Hi, $name!',
+                  t.hi(name: name),
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w300,
