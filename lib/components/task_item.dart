@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:polymathic/components/tag.dart';
 import 'package:polymathic/helpers/database.dart';
+import 'package:polymathic/i18n/strings.g.dart' show t;
 import 'package:polymathic/utils/stat.dart';
 import 'package:polymathic/utils/task.dart';
 
@@ -21,6 +22,7 @@ class TaskItem extends StatefulWidget {
 
 class _TaskItemState extends State<TaskItem> {
   Stat stat;
+  double duration;
 
   final dbHelper = DatabaseHelper.instance;
 
@@ -85,33 +87,37 @@ class _TaskItemState extends State<TaskItem> {
                       color: Colors.grey,
                     ),
                   ),
-                  if (widget.task['important'] == 1 ||
-                      widget.task['urgent'] == 1)
-                    SizedBox(
-                      height: 8.0,
-                    ),
-                  if (widget.task['important'] == 1 ||
-                      widget.task['urgent'] == 1)
-                    Row(
-                      children: <Widget>[
-                        if (widget.task['important'] == 1)
-                          Tag(
-                            text: 'Important',
-                            color: Colors.indigo[400],
-                            textColor: Colors.white,
-                          ),
-                        if (widget.task['important'] == 1)
-                          SizedBox(
-                            width: 8.0,
-                          ),
-                        if (widget.task['urgent'] == 1)
-                          Tag(
-                            text: 'Urgent',
-                            color: Colors.pink[400],
-                            textColor: Colors.white,
-                          ),
-                      ],
-                    ),
+                  SizedBox(
+                    height: 8.0,
+                  ),
+                  Row(
+                    children: <Widget>[
+                      if (widget.task['important'] == 1)
+                        Tag(
+                          text: 'Important',
+                          color: Colors.indigo[400],
+                          textColor: Colors.white,
+                        ),
+                      if (widget.task['important'] == 1)
+                        SizedBox(
+                          width: 8.0,
+                        ),
+                      if (widget.task['urgent'] == 1)
+                        Tag(
+                          text: 'Urgent',
+                          color: Colors.pink[400],
+                          textColor: Colors.white,
+                        ),
+                      if (widget.task['urgent'] == 1)
+                        SizedBox(
+                          width: 8.0,
+                        ),
+                      Tag(
+                        text: "$duration ${t.hours}",
+                        color: Color(0x14000000),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -192,9 +198,14 @@ class _TaskItemState extends State<TaskItem> {
     stat = Stat(
       important: widget.task['important'],
       urgent: widget.task['urgent'],
+      duration: widget.task['duration'],
       added: 0,
       removed: 1,
     );
+
+    setState(() {
+      duration = widget.task['duration'];
+    });
   }
 
   void removeTask({Function onComplete}) {
@@ -202,6 +213,7 @@ class _TaskItemState extends State<TaskItem> {
     stat = Stat(
       important: widget.task['important'],
       urgent: widget.task['urgent'],
+      duration: widget.task['duration'],
       added: -1,
       removed: 0,
     );

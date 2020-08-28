@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 String getAdvice(Map<String, dynamic> task) {
   final bool isImportant = task['important'] == 1;
   final bool isUrgent = task['urgent'] == 1;
@@ -15,17 +17,18 @@ String getAdvice(Map<String, dynamic> task) {
 
 int getScore(Map<String, dynamic> task) {
   // todo: improve the score to be more accurate
-  int score = 0;
+  int weight = 0;
+  double duration = task['duration'];
 
   if (task['important'] == 1) {
-    score += 2;
+    weight += 2;
   }
 
   if (task['urgent'] == 1) {
-    score++;
+    weight += 1;
   }
 
-  return score;
+  return ((weight / duration * 100) - duration).round();
 }
 
 List<Map<String, dynamic>> sortTasks(List<Map<String, dynamic>> tasks) {
@@ -40,19 +43,22 @@ class Task {
   final String content;
   final int isImportant;
   final int isUrgent;
+  final double duration;
 
   Task({
     this.id,
-    this.content,
-    this.isImportant,
-    this.isUrgent,
+    @required this.content,
+    @required this.isImportant,
+    @required this.isUrgent,
+    @required this.duration,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'content': this.content,
       'important': this.isImportant,
-      'urgent': this.isUrgent
+      'urgent': this.isUrgent,
+      'duration': this.duration,
     };
   }
 }

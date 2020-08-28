@@ -15,11 +15,13 @@ class DatabaseHelper {
   static final taskContent = 'content';
   static final taskIsImportant = 'important';
   static final taskIsUrgent = 'urgent';
+  static final taskDuration = 'duration';
 
   static final statId = '_id';
   static final statDate = 'date';
   static final statImportant = 'important';
   static final statUrgent = 'urgent';
+  static final statDuration = 'duration';
   static final statAdded = 'added';
   static final statRemoved = 'removed';
 
@@ -83,7 +85,8 @@ class DatabaseHelper {
       $taskId INTEGER PRIMARY KEY,
       $taskContent TEXT NOT NULL,
       $taskIsImportant INTEGER NOT NULL,
-      $taskIsUrgent INTEGER NOT NULL
+      $taskIsUrgent INTEGER NOT NULL,
+      $taskDuration REAL NOT NULL
     )
     ''');
 
@@ -93,6 +96,7 @@ class DatabaseHelper {
       $statDate TEXT NOT NULL,
       $statImportant INTEGER NOT NULL,
       $statUrgent INTEGER NOT NULL,
+      $statDuration REAL NOT NULL,
       $statAdded INTEGER NOT NULL,
       $statRemoved INTEGER NOT NULL
     )

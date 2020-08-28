@@ -19,6 +19,7 @@ class _TaskPageState extends State<TaskPage> {
   bool _isAddable = false;
   bool isImportant = false;
   bool isUrgent = false;
+  double duration = 1.0;
   String taskContent = '';
 
   final dbHelper = DatabaseHelper.instance;
@@ -46,7 +47,7 @@ class _TaskPageState extends State<TaskPage> {
                             keyboardType: TextInputType.text,
                             textCapitalization: TextCapitalization.sentences,
                             decoration: InputDecoration(
-                              labelText: t.tasks,
+                              labelText: t.yourTask,
                               border: InputBorder.none,
                               hintText: t.enterYourTask,
                             ),
@@ -78,15 +79,19 @@ class _TaskPageState extends State<TaskPage> {
                                 content: taskContent,
                                 isImportant: isImportant ? 1 : 0,
                                 isUrgent: isUrgent ? 1 : 0,
+                                duration: duration,
                               );
+
                               Stat stat = Stat(
                                 urgent: isUrgent ? 1 : 0,
                                 important: isImportant ? 1 : 0,
+                                duration: duration,
                                 added: 1,
                                 removed: 0,
                               );
-                              _insertStat(stat);
-                              _onPressAddButton(task);
+
+                              _onPressAddButton(task, stat);
+
                               setState(() {
                                 _isAddTaskVisible = false;
                               });
@@ -100,6 +105,22 @@ class _TaskPageState extends State<TaskPage> {
                     color: Color(0x14000000),
                     child: Column(
                       children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: TextField(
+                            keyboardType: TextInputType.number,
+                            textCapitalization: TextCapitalization.sentences,
+                            decoration: InputDecoration(
+                              labelText: t.estimatedDuration,
+                              border: InputBorder.none,
+                              hintText: t.estimatedDurationHint,
+                            ),
+                            onChanged: (value) {
+                              duration =
+                                  double.parse(value.replaceAll(',', '.'));
+                            },
+                          ),
+                        ),
                         SwitchListTile(
                           activeColor: kPrimaryColor,
                           value: isImportant,
@@ -245,12 +266,13 @@ class _TaskPageState extends State<TaskPage> {
     print('inserted task: $id');
   }
 
-  void _onPressAddButton(Task task) {
-    print(task.toMap());
+  void _onPressAddButton(Task task, Stat stat) {
     _insertTask(task);
+    _insertStat(stat);
     query();
     _isAddable = false;
     isImportant = false;
     isUrgent = false;
+    duration = 1.0;
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/material.dart';
 import 'package:polymathic/helpers/database.dart';
 
 double getProductivityIndex(
@@ -33,6 +34,7 @@ class Stat {
   int id;
   final int urgent;
   final int important;
+  final double duration;
   final int added;
 
   final int removed;
@@ -41,10 +43,11 @@ class Stat {
 
   Stat({
     this.id,
-    this.urgent,
-    this.important,
-    this.added,
-    this.removed,
+    @required this.urgent,
+    @required this.important,
+    @required this.duration,
+    @required this.added,
+    @required this.removed,
   });
 
   Map<String, dynamic> toMap() {
@@ -52,6 +55,7 @@ class Stat {
       'date': date,
       'urgent': urgent,
       'important': important,
+      'duration': duration,
       'added': added,
       'removed': removed
     };

@@ -52,6 +52,10 @@ class Strings {
 	String get askName => 'What\'s your name?';
 	String hi({@required Object name}) => 'Hi, $name!';
 	String get tasks => 'Tasks';
+	String get yourTask => 'Your task';
+	String get estimatedDuration => 'Estimated duration (hours)';
+	String get estimatedDurationHint => 'Number of hours for completion';
+	String get hours => 'hour(s)';
 	String get reports => 'Reports';
 	String get about => 'About';
 	String get addTask => 'Add a new task';
@@ -80,7 +84,11 @@ class StringsFr extends Strings {
 	@override String get welcome => 'Bienvenu sur';
 	@override String get askName => 'Comment vous appelez-vous ?';
 	@override String hi({@required Object name}) => 'Salut $name !';
+	@override String get yourTask => 'Votre tâche';
 	@override String get tasks => 'Tâches';
+	@override String get estimatedDuration => 'Durée estimée (heures)';
+	@override String get estimatedDurationHint => 'Nombre d\'heures pour la complétion';
+	@override String get hours => 'heure(s)';
 	@override String get reports => 'Rapports';
 	@override String get about => 'A Propos';
 	@override String get addTask => 'Ajouter une tâche';
