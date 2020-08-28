@@ -28,7 +28,7 @@ int getScore(Map<String, dynamic> task) {
     weight += 1;
   }
 
-  return ((weight / duration * 100) - duration).round();
+  return ((weight / duration * 1000) - duration).round();
 }
 
 List<Map<String, dynamic>> sortTasks(List<Map<String, dynamic>> tasks) {
