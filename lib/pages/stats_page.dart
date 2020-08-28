@@ -215,8 +215,6 @@ class _StatsPageState extends State<StatsPage> {
     List<Map> output = await dbHelper.query(sql);
     int value = output.length;
 
-    value = 2;
-
     if (this.mounted) {
       setState(() {
         _enoughData = (value < 2) ? false : true;
