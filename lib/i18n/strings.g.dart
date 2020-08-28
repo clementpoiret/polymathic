@@ -81,7 +81,7 @@ class StringsFr extends Strings {
 	static StringsFr _instance = StringsFr();
 	static StringsFr get instance => _instance;
 
-	@override String get welcome => 'Bienvenu sur';
+	@override String get welcome => 'Bienvenue sur';
 	@override String get askName => 'Comment vous appelez-vous ?';
 	@override String hi({@required Object name}) => 'Salut $name !';
 	@override String get yourTask => 'Votre tâche';

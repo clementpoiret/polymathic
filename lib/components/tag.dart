@@ -5,7 +5,7 @@ class Tag extends StatelessWidget {
     Key key,
     @required this.text,
     @required this.color,
-    @required this.textColor,
+    this.textColor,
   }) : super(key: key);
 
   final String text;
