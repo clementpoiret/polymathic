@@ -22,12 +22,16 @@ class TaskItem extends StatefulWidget {
 
 class _TaskItemState extends State<TaskItem> {
   Stat stat;
-  double duration;
+  double duration = 1.0;
 
   final dbHelper = DatabaseHelper.instance;
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      duration = widget.task['duration'];
+    });
+
     return Card(
       elevation: 0.0,
       child: Padding(
@@ -223,13 +227,13 @@ class _TaskItemState extends State<TaskItem> {
     onComplete();
   }
 
-  void _deleteStat() async {
-    final rowsDeleted = await dbHelper.delete(
-      DatabaseHelper.statsTable,
-      stat.id,
-    );
-    print('deleted $rowsDeleted stat(s): stat ${stat.id}');
-  }
+  // void _deleteStat() async {
+  //   final rowsDeleted = await dbHelper.delete(
+  //     DatabaseHelper.statsTable,
+  //     stat.id,
+  //   );
+  //   print('deleted $rowsDeleted stat(s): stat ${stat.id}');
+  // }
 
   void _deleteTask() async {
     final rowsDeleted = await dbHelper.delete(
@@ -247,11 +251,11 @@ class _TaskItemState extends State<TaskItem> {
     print('inserted stat: $id');
   }
 
-  void _reinsertTask() async {
-    final id = await dbHelper.insert(
-      DatabaseHelper.tasksTable,
-      widget.task,
-    );
-    print('reinserted task: $id');
-  }
+  // void _reinsertTask() async {
+  //   final id = await dbHelper.insert(
+  //     DatabaseHelper.tasksTable,
+  //     widget.task,
+  //   );
+  //   print('reinserted task: $id');
+  // }
 }
